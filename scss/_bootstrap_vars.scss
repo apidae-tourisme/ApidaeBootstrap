@@ -1,0 +1,20 @@
+$outremer: #213162;
+$grisfonce: #645E51;
+$vertdeau: #C7EAC4;
+$bleuroi: #168AC8;
+$corail: #F46754;
+$boutondor: #FCEF8B;
+
+$body-color: rgb(50, 49, 48);
+$body-bg: #f7f7f7;
+$border-radius: 2em;
+$success: $vertdeau;
+$primary: $bleuroi;
+$warning: $boutondor;
+$danger: $corail;
+
+$nav_height : 4.375rem;
+
+$lights: (
+    warning: $warning,
+    success: darken($vertdeau, 40%));

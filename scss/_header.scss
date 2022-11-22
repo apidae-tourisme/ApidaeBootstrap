@@ -1,0 +1,30 @@
+header {
+    height: 4.375rem;
+    background: $white ;
+    border-bottom: .0625rem solid #ececec;
+    box-shadow: 0 1.6px 3.6px 0 rgb(0 0 0 / 13%), 0 0.3px 0.9px 0 rgb(0 0 0 / 11%);
+    padding: .3125rem 0.9375rem;
+}
+
+header>nav {
+    height: 100%;
+}
+
+header>nav>div {
+    height: 100%;
+}
+
+header a.logo-apidae {
+    background-image: url("images/logo-apidae.svg");
+    background-position: center left;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    height: 100%;
+    width: 13.3125rem;
+}
+
+header a.logo-apidae>span {
+    font-size: 0;
+    display: none;
+}

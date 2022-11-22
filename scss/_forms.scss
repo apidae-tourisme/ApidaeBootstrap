@@ -1,0 +1,38 @@
+
+
+main>form div#form.d-flex {
+
+    font-size:.8em ;
+
+    padding:1.5em ;
+    margin-bottom:3em ;
+    color:#605e5c ;
+    display:flex ;
+
+    @include text-block() ;
+
+    div.form-group {
+        padding-left:1em ;
+        padding-right:1em ;
+    }
+
+    /* button submit */
+    div.form-group:last-of-type {
+        display: flex;
+        flex-flow: column;
+        justify-content: flex-end;
+        button { font-size:1em ; }
+    }
+
+    div.form-group .form-control {
+        font-size:1em ; /* Default is 1rem */
+    }
+}
+
+div.form_helper {
+    margin-bottom:2em ;
+    margin-top:-2em;
+    @include text-block() ;
+    padding:1.5em ;
+    font-size:.8em ;
+}

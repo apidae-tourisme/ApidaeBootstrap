@@ -1,54 +1,61 @@
 {
-  "name": "bootstrap-npm-starter",
-  "version": "1.4.0",
+  "name": "apidae-bootstrap",
+  "version": "0.1",
   "private": true,
-  "description": "Demo project for building a Bootstrap powered site via npm.",
-  "author": "mdo",
+  "description": "Thème Bootstrap pour les briques Apidae Tourisme",
+  "author": "Apidae Tourisme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/twbs/bootstrap-npm-starter.git"
+    "url": "git+https://github.com/apidae-tourisme/ApidaeBootstrap.git"
   },
   "bugs": {
-    "url": "https://github.com/twbs/bootstrap-npm-starter/issues"
+    "url": "https://github.com/apidae-tourisme/ApidaeBootstrap/issues"
   },
-  "homepage": "https://github.com/twbs/bootstrap-npm-starter#readme",
+  "homepage": "https://github.com/apidae-tourisme/ApidaeBootstrap/#readme",
   "scripts": {
-    "build": "npm run css",
-    "css-compile": "node-sass --include-path node_modules --output-style compressed --source-map true --source-map-contents true --precision 6 scss -o assets/css/",
+    "build": "npm-run-all --parallel css js",
+    "css-compile-code": "node-sass --include-path node_modules --output-style compressed --source-map true --source-map-contents true --precision 6 scss -o dist/",
+    "css-compile": "sass --load-path=node_modules scss/apidae.scss dist/apidae.css",
     "css-lint": "stylelint scss/",
-    "css-prefix": "postcss --replace assets/css/starter.css --use autoprefixer --map",
-    "css-purge": "purgecss --keyframes --css assets/css/starter.css --content index.html \"node_modules/bootstrap/js/dist/{util,modal}.js\" --output assets/css/",
+    "css-prefix": "postcss --replace dist/apidae.css --use autoprefixer --map",
+    "css-purge": "purgecss --keyframes --css dist/apidae.css --content dist/index.html \"node_modules/bootstrap/js/dist/{util,modal}.js\" --output dist/",
     "css": "npm-run-all css-compile css-prefix",
     "server": "serve --listen 3000",
     "start": "npm-run-all --parallel watch server",
     "watch": "nodemon -e html,scss -x \"npm run css\"",
-    "test": "npm run css-lint && npm run css"
+    "test": "npm run css-lint && npm run css",
+    "js": "npm-run-all js-compile",
+    "js-compile": "npx webpack --config webpack.config.js",
+    "assets": "cp -r assets/* dist/"
   },
   "keywords": [
     "bootstrap",
-    "sass",
-    "css",
-    "javascript",
-    "starter",
-    "template"
+    "apidae",
+    "apidae-tourisme",
+    "template",
+    "theme"
   ],
   "dependencies": {
-    "bootstrap": "^4.6.0",
-    "bootstrap-icons": "^1.4.0",
+    "@fortawesome/fontawesome-free": "^5.15.3",
+    "@popperjs/core": "^2.9.3",
+    "bootstrap": "^5.2.3",
+    "bootstrap-icons": "^1.5.0",
     "jquery": "^3.6.0",
-    "popper.js": "^1.16.1"
+    "sass": "^1.38.2"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
-    "node-sass": "^5.0.0",
+    "move-assets-webpack-plugin": "^1.3.2",
     "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.10",
     "postcss-cli": "^8.3.1",
     "purgecss": "^4.0.2",
-    "serve": "^11.3.2",
+    "serve": "^14.1.2",
     "stylelint": "^13.12.0",
-    "stylelint-config-twbs-bootstrap": "^2.1.0"
+    "stylelint-config-twbs-bootstrap": "^2.1.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
   }
 }

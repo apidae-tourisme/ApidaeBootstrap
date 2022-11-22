@@ -1,0 +1,36 @@
+table.taches code,
+table.taches pre {
+    font-size:.6em ;
+    max-height:125px ;
+    max-width:350px ;
+    overflow:auto ;
+    display:block ;
+    padding:4px 8px ;
+}
+
+table.taches pre {
+    background:black ;
+    color:white ;
+}
+
+table.taches pre.dev:before {
+    content:"dev" ;
+    position:absolute ;
+    top:0 ;
+    right:0 ;
+    padding:2px 5px ;
+    background:yellow ;
+    color:red ;
+}
+table.taches pre.dev {
+    background:rgb(139, 0, 0) ;
+    position:relative ;
+}
+
+table.taches .details {
+    cursor:pointer ;
+}
+
+table.taches .result code {
+    display:none ;
+}

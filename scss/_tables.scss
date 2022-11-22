@@ -1,0 +1,48 @@
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    background:white !important ;
+}
+
+.dataTables_wrapper .top,
+.dataTables_wrapper .bottom {
+    display:flex ;
+    flex-wrap:nowrap ;
+    justify-content: space-between;
+    align-items: baseline ;
+}
+
+.table.sticky {
+    tbody {
+        position:relative ;
+    }
+
+    thead tr {
+        background:inherit ;
+    }
+
+    thead th {
+        position: sticky;
+        top: 60px;
+        z-index: 1;
+        background:inherit ;
+      }
+      
+    tbody th {
+        position: relative;
+      }
+    thead th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+      }
+    tbody tr {
+        background:white ;
+    }
+    tbody td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background:inherit ;
+      }
+
+}

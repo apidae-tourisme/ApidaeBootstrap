@@ -1,0 +1,74 @@
+$menubck : #343a40 ;
+
+nav#sidebarMenu>div {
+
+    >ul.nav>li.active { background: lighten($menubck,60%) ; }
+    >ul.nav>li.active>ul>li.active { background: lighten($menubck,70%) ; }
+    >ul.nav>li.active>ul>li.active>ul>li.active { background: lighten($menubck,80%) ; }
+    >ul.nav>li.active>ul>li.active>ul>li.active>ul>li.active { background: lighten($menubck,90%) ; }
+
+    >ul.nav>li>a { padding-left:1em ; }
+    >ul.nav>li>ul>li>a { padding-left:2em ; }
+    >ul.nav>li>ul>li>ul>li>a { padding-left:3em ; }
+    >ul.nav>li>ul>li>ul>li>ul>li>a { padding-left:4em ; }
+
+    li { transition: all 0.5s ease; }
+
+    li.active span.chevron:after {
+        content: "\f054" ;
+        float:right ;
+        font-weight:bold ;
+        font-family:'Font Awesome 5 Free' ;
+    }
+    li.active>a>span.chevron:after {
+        content:"\f078" ;
+    }
+
+    >ul.nav>li.active li.active>a {
+        font-weight:bold ;
+    }
+
+    >ul.nav>li.active>a {
+
+        background:rgba($menubck,80%) ;
+        color:white ;
+
+    }
+
+    ul.nav {
+        font-size:.9em ; 
+    }
+    
+    img.ico {
+        height:16px ;
+        vertical-align:text-top ;
+    }
+
+    h3 {
+        padding:1em ;
+        font-size:.9rem ;
+        text-transform: uppercase ;
+        font-weight:bold ;
+        border-top:1px solid #343a40 ;
+        margin:0 ;
+    }
+
+    >ul>li ul {
+        display:none ;
+    }
+    li.active>ul {
+        display:block ;
+    }
+    >ul li.active>a {
+        font-weight:bold ;
+    }
+
+    >ul.nav>li>a:before {
+        background-size: 16px 16px;
+        display: inline-block;
+        width: 16px; 
+        height: 16px;
+        content:"";
+    }
+
+}

@@ -1,0 +1,37 @@
+ul.home {
+    display: flex;
+    list-style-type: none;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+ul.home>li {
+    @include text-block();
+    width: auto;
+    margin-right: 1em;
+    margin-bottom: 1em;
+}
+
+ul.home ul {
+    padding-left: 1rem;
+    margin-left: 1.5rem;
+    list-style-type: disc;
+}
+
+ul.home>li>a {
+    font-weight: bold;
+    color: black;
+}
+
+ul.home ul a {
+    padding-left: 0;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100%;
+    font-family: "RebrandDis";
+}
