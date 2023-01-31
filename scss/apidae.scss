@@ -71,6 +71,7 @@ $enable-shadows: true;
 @import "bootstrap/scss/bootstrap-utilities";
 @import "bootstrap/scss/containers";
 // @import "bootstrap/scss/print";
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 
 
 //
@@ -98,5 +99,4 @@ $enable-shadows: true;
 @import "icons";
 @import "taches";
 
-@import "@fortawesome/fontawesome-free/css/all.min.css";
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
