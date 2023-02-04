@@ -1,0 +1,21 @@
+{
+    "name": "apidae-tourisme/apidae-bootstrap",
+    "autoload": {
+        "psr-4": {
+            "ApidaeTourisme\\ApidaeBootstrap\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pierre Granger",
+            "email": "pierre.granger@apidae-tourisme.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:apidae-tourisme/ApidaeSIT.git"
+        }
+    ],
+    "require": {}
+}
