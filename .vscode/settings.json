@@ -1,0 +1,7 @@
+{
+    "editor.formatOnType": true,
+    "twig-language-2.formatObject": "default",
+    "twig-language-2.formatting": false,
+    "twig-language-2.unformatted": true,
+    "html.format.enable": true
+}

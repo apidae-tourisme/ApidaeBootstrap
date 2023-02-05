@@ -2,10 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>
-			{% block title %}Apidae Tourisme - Imports
-			{% endblock %}
-		</title>
+		<title>{% block title %}Apidae Tourisme - Bootstram{% endblock %}</title>
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
 		{% block stylesheets %}
 			{{ encore_entry_link_tags('app') }}
@@ -21,15 +18,13 @@
 				<span>Apidae Tourisme</span>
 			</a>
 			<ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-				<li class="nav-item">
-					<a href="{{ path('passerelles') }}" class="nav-link {% if app.request.get('_route') == 'passerelles' %}active{% endif %}">Mes passerelles</a>
-				</li>
-				<li class="nav-item">
-					<a href="#" class="nav-link">Page 2</a>
-				</li>
-				<li class="nav-item">
-					<a href="#" class="nav-link">Page 3</a>
-				</li>
+				{% if nav is defined and nav is iterable %}
+					{% for path, name in nav %}
+						<li class="nav-item">
+							<a href="{{ path('passerelles') }}" class="nav-link {% if app.request.get('_route') == 'passerelles' %}active{% endif %}">Mes passerelles</a>
+						</li>
+					{% endfor %}
+				{% endif %}
 			</ul>
 			<div class="dropdown text-end">
 				{% include('header.user.html.twig') %}
@@ -38,11 +33,8 @@
 
 		<div class="container">
 
-			<div class="main"> {% block main %}{% endblock %}
-				</div>
-
+			<div class="main">{% block main %}{% endblock %}</div>
 				<hr class="my-5">
-
 				<p class="text-muted">Apidae Tourisme</p>
 			</div>
 
