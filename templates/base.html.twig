@@ -21,7 +21,7 @@
 				{% if nav is defined and nav is iterable %}
 					{% for path, name in nav %}
 						<li class="nav-item">
-							<a href="{{ path('passerelles') }}" class="nav-link {% if app.request.get('_route') == 'passerelles' %}active{% endif %}">Mes passerelles</a>
+							<a href="{{ path(path) }}" class="nav-link {% if app.request.get('_route') == path %}active{% endif %}">{{ name }}</a>
 						</li>
 					{% endfor %}
 				{% endif %}
