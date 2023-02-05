@@ -1,4 +1,4 @@
-{% if app.user is defined %}
+{% if app.user.gravatar is defined %}
 <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 	<img src="h{{ app.user.gravatar }}" alt="{{ app.user.email }}" width="32" height="32" class="rounded-circle">
 </a>
@@ -17,6 +17,6 @@
 		<hr class="dropdown-divider">
 	</li>
 	<li>
-		<a class="dropdown-item" href="/logout">Sign out</a>
+		<a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
 	</li>
 </ul>
