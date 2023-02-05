@@ -1,0 +1,20 @@
+{% for link in links %}
+  {% if link.name is defined %}
+    <li class="nav-item {{ link.name }} {{ link.class }}{% if link.sublinks is defined %} sub{% endif %}">
+        {% if link.path is not null %}
+          <a class="nav-link" href="{{ path(link.path) }}">
+            {{ link.name|trans }}
+            {% if link.sublinks is defined and link.sublinks is not null %}<span class="chevron"></span>{% endif %}
+          </a>
+        {% endif %}
+        {% if link.sublinks is defined %}
+          {% if link.path is null %}
+            {{ link.name|trans }}
+          {% endif %}
+          <ul class="nav flex-column">
+              {% include "menu.html.twig" with {'links': link.sublinks} %}
+          </ul>
+        {% endif %}
+    </li>
+  {% endif %}
+{% endfor %}

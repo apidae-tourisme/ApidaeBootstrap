@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% if app_env !== 'prod' %}[{{ app_env }}] &bull; {% endif %}{% block title %}Apidae Bootstrap{% endblock %}</title>
+        <title>{% if app_env == 'dev' %}DEV &bull; {% endif %}{% block title %}Console Apidae{% endblock %}</title>
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -28,28 +28,17 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
+
         gtag('config', 'G-FPWZ1VY45E');
         </script>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
     </head>
-    <body class="{{ app_env }}">
+    <body class="{{ app_env }} standalone">
         {% block body %}
-            {% include 'header.user.html.twig' %}
-            {% block nav %}{% include 'nav.html.twig' %}{% endblock %}
             {% block container %}
             <div class="container-fluid">
                 <div class="row">
-                    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                        <div class="sidebar-sticky pt-3">
-                            <ul class="nav flex-column">
-                                {{ render(path('menu')) }}
-                            </ul>
-                        </div>
-                    </nav>
-                    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-                        {% block breadcrumb %}
-                            {{ render(path('breadcrumb')) }}
-                        {% endblock %}
+                    <main role="main" class="ml-sm-auto px-md-4">
                         {% block h1 %}
                             <h1>{{ titre|default(app.request.get('_route')|trans) }}</h1>
                         {% endblock %}
@@ -57,19 +46,15 @@
                             {% include 'alerts.html.twig' %}
                         {% endblock %}
                         {% block main %}{% endblock %}
-                        {% block helper %}{% endblock %}
                         {% if debug is defined %}
                             {{ dump(debug) }}
                         {% endif %}
-                        {% if gql is defined %}
-                            <pre style="font-size:.6em;max-height:80px;overflow:auto;"><code>{{ gql }}</code></pre>
-                        {% endif %}
+                        {% block helper %}{% endblock %}
                     </main>
                 </div>
             </div>
             {% endblock %}
         {% endblock %}
         {% include 'env.html.twig' %}
-        <footer>{{ gitVersion() }}</footer>
     </body>
 </html>

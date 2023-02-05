@@ -1,0 +1,11 @@
+<nav aria-label="breadcrumb" style="margin-left:-1.5rem;margin-right:-1.5rem;">
+    <ol class="breadcrumb">
+        {% for b in breadcrumb %}
+            <li class="breadcrumb-item">
+                {% if b.path is defined %}<a href="{{ b.path }}">{% endif %}
+                    {{ b.route|trans }}
+                {% if b.path is defined %}</a>{% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+</nav>

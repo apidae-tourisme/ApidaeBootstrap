@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+	<header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between mb-4 border-bottom">
+		<a href="/" class="logo-apidae d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+			<span>Apidae Tourisme</span>
+			<strong>Imports {% if app_env != 'prod' %}.{{ app_env }}{% endif %}</strong>
+		</a>
+		<ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+			<li class="nav-item">
+				<a href="{{ path('passerelles') }}" class="nav-link {% if app.request.get('_route') == 'passerelles' %}active{% endif %}">Mes passerelles</a>
+			</li>
+			<li class="nav-item">
+				<a href="#" class="nav-link">Page 2</a>
+			</li>
+			<li class="nav-item">
+				<a href="#" class="nav-link">Page 3</a>
+			</li>
+		</ul>
+		<div class="dropdown text-end">
+			{% include('header.user.html.twig') %}
+		</div>
+	</header>
+
+	<div class="container">
+
+		<div class="main">
+			{% block main %}{% endblock %}
+		</div>
+
+		<hr class="my-5">
+
+		<p class="text-muted">Apidae Tourisme</p>
+	</div>
+
+{% endblock %}

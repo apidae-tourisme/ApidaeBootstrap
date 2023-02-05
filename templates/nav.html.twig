@@ -1,0 +1,19 @@
+<nav class="navbar lex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="/">
+    <strong>Console{% if app_env != 'prod' %}.{{app_env}}{% endif %}</strong>
+  </a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <!--
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  -->
+  <ul class="navbar-nav flex-row right">
+    <li class="nav-item text-nowrap">
+      <a class="nav-link" href="{{ path('user') }}">{#<i class="far fa-user"></i>#}<i class="ms-Icon ms-Icon--Contact" aria-hidden="true"></i></a>
+    </li>
+    <li class="nav-item text-nowrap">
+      <a class="nav-link" href="{{ path('app_logout') }}">{#<i class="fas fa-power-off"></i>#}<i class="ms-Icon ms-Icon--SignOut" aria-hidden="true"></i></a>
+    </li>
+  </ul>
+</nav>

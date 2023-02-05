@@ -1,0 +1,15 @@
+    {% if alerts is defined %}
+        {% for alert in alerts %}
+            <div class="alert alert-{{ alert.type }}">
+                {% if alert.message is iterable %}
+                    <ul>
+                    {% for msg in alert.message %}
+                        <li>{{ msg|raw }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    {{ alert.message|raw }}
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}

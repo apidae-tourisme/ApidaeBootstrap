@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{% block title %}Apidae Tourisme - Bootstrap{% endblock %}</title>
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('app') }}
+		{% endblock %}
+		{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+		{% endblock %}
+	</head>
+	<body>
+		<header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+			<a href="/" class="logo-apidae d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+				<span>Apidae Tourisme</span>
+			</a>
+			<ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+				{% if nav is defined and nav is iterable %}
+					{% for path, name in nav %}
+						<li class="nav-item">
+							<a href="{{ path(path) }}" class="nav-link {% if app.request.get('_route') == path %}active{% endif %}">{{ name }}</a>
+						</li>
+					{% endfor %}
+				{% endif %}
+			</ul>
+			<div class="dropdown text-end">
+				{% include('header.user.html.twig') %}
+			</div>
+		</header>
+
+		<div class="container">
+
+			<div class="main">{% block main %}{% endblock %}</div>
+				<hr class="my-5">
+				<p class="text-muted">Apidae Tourisme</p>
+			</div>
+
+		</body>
+	</html>
