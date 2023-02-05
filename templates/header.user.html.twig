@@ -1,6 +1,6 @@
 {% if app.user.gravatar is defined %}
 <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-	<img src="h{{ app.user.gravatar }}" alt="{{ app.user.email }}" width="32" height="32" class="rounded-circle">
+	<img src="{{ app.user.gravatar }}" alt="{{ app.user.email }}" width="32" height="32" class="rounded-circle">
 </a>
 {% endif %}
 <ul class="dropdown-menu text-small" style="">
