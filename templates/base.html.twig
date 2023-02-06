@@ -19,22 +19,43 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
         <link
-  rel="stylesheet"
-  href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"
-/>
+            rel="stylesheet"
+            href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"
+        />      
+        {% if app_tagmanager_id is defined %}
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-FPWZ1VY45E"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ app_tagmanager_id }}"></script>
         <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-FPWZ1VY45E');
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ app_tagmanager_id }}');
         </script>
+        {% endif %}
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
     </head>
     <body class="{{ app_env }}">
         {% block body %}
-            {% include 'header.user.html.twig' %}
+            <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+                <a href="/" class="logo-apidae d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                    <span>Apidae</span>
+                    {% if app_title is defined %}
+                        <strong>{{ app_title }}{% if app_env != 'prod' %}.{{ app_env }}{% endif %}</strong>
+                    {% endif %}
+                </a>
+                <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                    {% if nav is defined and nav is iterable %}
+                        {% for path, name in nav %}
+                            <li class="nav-item">
+                                <a href="{{ path(path) }}" class="nav-link {% if app.request.get('_route') == path %}active{% endif %}">{{ name }}</a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <div class="dropdown text-end">
+                    {% include 'header.user.html.twig' %}
+                </div>
+            </header>
             {% block nav %}{% include 'nav.html.twig' %}{% endblock %}
             {% block container %}
             <div class="container-fluid">
