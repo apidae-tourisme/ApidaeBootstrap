@@ -1,9 +1,6 @@
-
-
 body {
-  font-family:Poppins ;
-  background:#f7f7f7 ;
-  &.dev { background:#c5dcc5 ; }
+  font-family: Poppins;
+  background: #f7f7f7;
 }
 
 .feather {
@@ -21,8 +18,10 @@ body {
   top: $nav_height ;
   bottom: 0;
   left: 0;
-  z-index: 10; /* Behind the navbar */
-  padding: 0; /* Height of navbar */
+  z-index: 10;
+  /* Behind the navbar */
+  padding: 0;
+  /* Height of navbar */
   border-right: 1px solid rgba(0, 0, 0, .1);
 }
 
@@ -38,7 +37,8 @@ body {
   height: calc(100vh - #{$nav_height});
   padding-top: .5rem;
   overflow-x: hidden;
-  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  overflow-y: auto;
+  /* Scrollable contents if viewport is shorter than content. */
 }
 
 @supports ((position: -webkit-sticky) or (position: sticky)) {
@@ -76,26 +76,31 @@ body {
  * Navbar
  */
 
- .navbar {
-   height:$nav_height ;
-   background:white ;
-   position:fixed ;
-   top:0 ;
-   left:0 ;
-   right:0 ;
-   z-index:30 ;
- }
- body.dev .navbar { background:#9cca94 ; }
+.navbar {
+  height: $nav_height ;
+  background: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+}
+
+body.dev .navbar {
+  background: #9cca94;
+}
 
 
 .navbar-brand {
-  padding:0 ;
-  display:inline-block ;
+  padding: 0;
+  display: inline-block;
 }
+
 .navbar-brand img {
-  height:calc(#{$nav_height} - 20px) ;
-  max-width:250px ;
+  height:calc(#{$nav_height} - 20px);
+  max-width: 250px;
 }
+
 .navbar-brand strong {
   display: inline-block;
   margin-top: 12px;
@@ -116,16 +121,17 @@ body {
 }
 
 .navbar ul.right {
-  padding-right:1em ;
+  padding-right: 1em;
+
   li {
-    padding-left:1em ;
-    padding-right:1em ; 
+    padding-left: 1em;
+    padding-right: 1em;
   }
 }
 
 .breadcrumb {
-  background:transparent ;
-  padding:1.5em 2em ;
+  background: transparent;
+  padding: 1.5em 2em;
 }
 
 .form-control-dark {
@@ -140,28 +146,28 @@ body {
 }
 
 .form-control {
-  border-radius:0 ;
-  background:#f7f7f7 ;
+  border-radius: 0;
+  background: #f7f7f7;
 }
 
 .badge {
-  border-radius:0 ;
-  padding:.5em 1em ;
+  border-radius: 0;
+  padding: .5em 1em;
 }
 
 table.dataTable thead th,
 table.dataTable.no-footer {
-  border-bottom:rgba(0,0,0,.4) !important ;
+  border-bottom: rgba(0, 0, 0, .4) !important;
 }
 
 table.table {
-  background:white ;
-  @include text-block() ;
+  background: white;
+  @include text-block();
 }
 
 table.table ul {
-  margin-bottom:0 ;
-  padding-left:1.4em ;
+  margin-bottom: 0;
+  padding-left: 1.4em;
 }
 
 .directory {
@@ -170,5 +176,5 @@ table.table ul {
 }
 
 main[role="main"] {
-  z-index:20 ;
+  z-index: 20;
 }

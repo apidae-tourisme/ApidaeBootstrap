@@ -14,20 +14,10 @@
   },
   "homepage": "https://github.com/apidae-tourisme/ApidaeBootstrap/#readme",
   "scripts": {
-    "build": "npm-run-all --parallel css js assets",
-    "css-compile-code": "node-sass --include-path node_modules --output-style compressed --source-map true --source-map-contents true --precision 6 scss -o dist/",
-    "css-compile": "sass --load-path=node_modules scss/apidae.scss dist/apidae.css",
-    "css-lint": "stylelint scss/",
-    "css-prefix": "postcss --replace dist/apidae.css --use autoprefixer --map",
-    "css-purge": "purgecss --keyframes --css dist/apidae.css --content dist/index.html \"node_modules/bootstrap/js/dist/{util,modal}.js\" --output dist/",
-    "css": "npm-run-all css-compile css-prefix",
-    "server": "serve --listen 3000",
-    "start": "npm-run-all --parallel watch server",
-    "watch": "nodemon -e html,scss -x \"npm run css\"",
-    "test": "npm run css-lint && npm run css",
-    "js": "npm-run-all js-compile",
-    "js-compile": "npx webpack --config webpack.config.js",
-    "assets": "cp -r assets/* dist/"
+    "dev-server": "encore dev-server",
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production --progress"
   },
   "keywords": [
     "bootstrap",
@@ -38,11 +28,14 @@
   ],
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.3",
+    "@hotwired/stimulus": "^3.2.1",
     "@popperjs/core": "^2.9.3",
+    "@symfony/stimulus-bridge": "^3.2.1",
+    "@symfony/webpack-encore": "github:symfony/webpack-encore",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.5.0",
-    "jquery": "^3.6.0",
-    "sass": "^1.38.2"
+    "core-js": "^3.27.2",
+    "jquery": "^3.6.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
@@ -52,10 +45,13 @@
     "postcss": "^8.2.10",
     "postcss-cli": "^8.3.1",
     "purgecss": "^4.0.2",
+    "sass": "^1.38.2",
+    "sass-loader": "^13.2.0",
     "serve": "^14.1.2",
     "stylelint": "^13.12.0",
     "stylelint-config-twbs-bootstrap": "^2.1.0",
     "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.0"
+    "webpack-cli": "^5.0.0",
+    "webpack-notifier": "^1.15.0"
   }
 }

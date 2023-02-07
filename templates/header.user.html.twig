@@ -1,17 +1,25 @@
-{% if app.user.gravatar is defined %}
-<a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-	<img src="{{ app.user.gravatar }}" alt="{{ app.user.email }}" width="32" height="32" class="rounded-circle">
-</a>
-{% endif %}
-{% if app.user is defined %}
-<ul class="dropdown-menu text-small" style="">
-	<li>{{ app.user.firstname }} {{ app.user.lastname }}</li>
-	<li>{{ app.user.email }}</li>
-	<li>
-		<hr class="dropdown-divider">
-	</li>
-	<li>
-		<a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
-	</li>
-</ul>
+{% if app.user is defined and app.user != null %}
+	<div class="dropdown text-end">
+		{% if app.user.gravatar is defined %}
+			<a href="#" class="d-block text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+				<img src="{{ app.user.gravatar }}" alt="{{ app.user.email }}" width="32" height="32" class="rounded-circle">
+			</a>
+		{% endif %}
+		<ul class="dropdown-menu text-small" style="">
+			{% if app.user.firstname is defined %}
+			<li>{{ app.user.firstname }} {{ app.user.lastname }}</li>
+			<li>{{ app.user.email }}</li>
+			{% endif %}
+			<li>
+				<hr class="dropdown-divider">
+			</li>
+			<li>
+				<a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
+			</li>
+		</ul>
+	</div>
+{% else %}
+	<a href="{{ path('app_login') }}" class="d-block text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+		<i class="fas fa-sign-in-alt"></i>
+	</a>
 {% endif %}
