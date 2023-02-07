@@ -10,12 +10,6 @@
             "email": "pierre.granger@apidae-tourisme.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:apidae-tourisme/ApidaeSIT.git"
-        }
-    ],
     "archive": {
         "exclude": [
             "assets",
