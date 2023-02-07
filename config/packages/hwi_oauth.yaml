@@ -4,11 +4,17 @@ hwi_oauth:
 
     # https://github.com/hwi/HWIOAuthBundle/blob/master/Resources/doc/2-configuring_resource_owners.md
     resource_owners:
-        facebook:
-            type:                facebook
-            client_id:           '%env(FB_ID)%'
-            client_secret:       '%env(FB_SECRET)%'
-            scope:               "email"
-            options:
-                display: popup
-                csrf: true
+        apidae:
+            type: oauth2
+            class: \App\Security\ApidaeResourceOwner
+            client_id: "%env(APIDAE_SSO_ID)%"
+            client_secret: "%env(APIDAE_SSO_SECRET)%"
+            access_token_url: "%env(APIDAE_SSO_URLACCESSTOKEN)%"
+            authorization_url: "%env(APIDAE_SSO_URLAUTHORIZE)%"
+            infos_url: "%env(APIDAE_SSO_URLRESOURCEOWNERDETAILS)%"
+            scope: "sso"
+            user_response_class: HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse
+            paths:
+                identifier: id
+                nickname: email
+                realname: fullname

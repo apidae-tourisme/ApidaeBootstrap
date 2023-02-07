@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90dead5e321125f771c582d69be442df",
+    "content-hash": "64108295607864165bd5f73751e03486",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2026,6 +2026,86 @@
             "time": "2022-10-14T12:47:21+00:00"
         },
         {
+            "name": "phpmailer/phpmailer",
+            "version": "v6.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPMailer/PHPMailer.git",
+                "reference": "49cd7ea3d2563f028d7811f06864a53b1f15ff55"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/49cd7ea3d2563f028d7811f06864a53b1f15ff55",
+                "reference": "49cd7ea3d2563f028d7811f06864a53b1f15ff55",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-filter": "*",
+                "ext-hash": "*",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+                "doctrine/annotations": "^1.2.6 || ^1.13.3",
+                "php-parallel-lint/php-console-highlighter": "^1.0.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3.2",
+                "phpcompatibility/php-compatibility": "^9.3.5",
+                "roave/security-advisories": "dev-latest",
+                "squizlabs/php_codesniffer": "^3.7.1",
+                "yoast/phpunit-polyfills": "^1.0.4"
+            },
+            "suggest": {
+                "ext-mbstring": "Needed to send email in multibyte encoding charset or decode encoded addresses",
+                "ext-openssl": "Needed for secure SMTP sending and DKIM signing",
+                "greew/oauth2-azure-provider": "Needed for Microsoft Azure XOAUTH2 authentication",
+                "hayageek/oauth2-yahoo": "Needed for Yahoo XOAUTH2 authentication",
+                "league/oauth2-google": "Needed for Google XOAUTH2 authentication",
+                "psr/log": "For optional PSR-3 debug logging",
+                "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)",
+                "thenetworg/oauth2-azure": "Needed for Microsoft XOAUTH2 authentication"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPMailer\\PHPMailer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-only"
+            ],
+            "authors": [
+                {
+                    "name": "Marcus Bointon",
+                    "email": "phpmailer@synchromedia.co.uk"
+                },
+                {
+                    "name": "Jim Jagielski",
+                    "email": "jimjag@gmail.com"
+                },
+                {
+                    "name": "Andy Prevost",
+                    "email": "codeworxtech@users.sourceforge.net"
+                },
+                {
+                    "name": "Brent R. Matzelle"
+                }
+            ],
+            "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
+            "support": {
+                "issues": "https://github.com/PHPMailer/PHPMailer/issues",
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.7.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Synchro",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-12-08T13:30:06+00:00"
+        },
+        {
             "name": "phpstan/phpdoc-parser",
             "version": "1.16.0",
             "source": {
@@ -2069,6 +2149,70 @@
                 "source": "https://github.com/phpstan/phpdoc-parser/tree/1.16.0"
             },
             "time": "2023-01-29T14:41:23+00:00"
+        },
+        {
+            "name": "pierre-granger/apidae-core",
+            "version": "v0.6.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PierreGranger/ApidaeCore.git",
+                "reference": "3771bc3fd67254ae37523291f498f87f0765f8eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PierreGranger/ApidaeCore/zipball/3771bc3fd67254ae37523291f498f87f0765f8eb",
+                "reference": "3771bc3fd67254ae37523291f498f87f0765f8eb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0|^8.0",
+                "phpmailer/phpmailer": "^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PierreGranger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Apidae Core",
+            "support": {
+                "issues": "https://github.com/PierreGranger/ApidaeCore/issues",
+                "source": "https://github.com/PierreGranger/ApidaeCore/tree/v0.6.5"
+            },
+            "time": "2022-10-07T16:42:49+00:00"
+        },
+        {
+            "name": "pierre-granger/apidae-membres",
+            "version": "v1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PierreGranger/ApidaeMembres.git",
+                "reference": "dcd8647d6f5dd214678c8752e6785f47a88e326c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PierreGranger/ApidaeMembres/zipball/dcd8647d6f5dd214678c8752e6785f47a88e326c",
+                "reference": "dcd8647d6f5dd214678c8752e6785f47a88e326c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0|^8.0",
+                "pierre-granger/apidae-core": "^0.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PierreGranger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Classe d'utilisation des API membres & utilisateurs d'Apidae ",
+            "support": {
+                "issues": "https://github.com/PierreGranger/ApidaeMembres/issues",
+                "source": "https://github.com/PierreGranger/ApidaeMembres/tree/v1.3"
+            },
+            "time": "2021-10-29T12:24:22+00:00"
         },
         {
             "name": "psr/cache",
