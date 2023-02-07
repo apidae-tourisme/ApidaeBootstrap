@@ -6,11 +6,9 @@
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
-
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
-
         <link rel="icon" href="{{ asset('build/images/favicon.ico') }}" />
         <script
         src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -41,20 +39,21 @@
             <div class="container-fluid">
                 <div class="row">
                     {% block sidebarMenu %}
-                    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block">
                         <div class="sidebar-sticky pt-3">
                             {% block sideBarMenuUl %}
-                            <ul class="nav flex-column">
-                                <li>Lien 1</li>
-                                <li>Lien 2</li>
-                            </ul>
+                                {% include 'demo/siteBarMenu.html.twig' %}
                             {% endblock %}
                         </div>
                     </nav>
                     {% endblock %}
                     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
                         {% block breadcrumb %}
-                            breadcrumb
+                            {% if breadcrumb is defined %}
+                                {% include 'breadcrumb.html.twig' %}
+                            {% else %}
+                                {% include 'demo/breadcrumb.html.twig' %}
+                            {% endif %}
                         {% endblock %}
                         {% block h1 %}
                             <h1>{{ titre|default(app.request.get('_route')|trans) }}</h1>
