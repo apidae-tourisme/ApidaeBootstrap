@@ -1,6 +1,6 @@
 {
     "doctrine/annotations": {
-        "version": "1.14",
+        "version": "2.0",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -42,11 +42,7 @@
             "branch": "main",
             "version": "0.6",
             "ref": "18ce21f16066cccfa0803c9e846a2e4f4bec92ab"
-        },
-        "files": [
-            "config/packages/hwi_oauth.yaml",
-            "config/routes/hwi_oauth_routing.yaml"
-        ]
+        }
     },
     "phpunit/phpunit": {
         "version": "10.0",
@@ -144,7 +140,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "6.0",
-            "ref": "2523f7d31488903e247a522e760dc279be7f7aaf"
+            "ref": "ba1ac4e919baba5644d31b57a3284d6ba12d52ee"
         },
         "files": [
             "config/packages/messenger.yaml"
@@ -285,6 +281,6 @@
         ]
     },
     "twig/extra-bundle": {
-        "version": "v3.5.0"
+        "version": "v3.5.1"
     }
 }

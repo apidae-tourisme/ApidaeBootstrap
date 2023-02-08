@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security ;
+namespace ApidaeTourisme\Bootstrap ;
 
 use Exception;
 use PierreGranger\ApidaeMembres;
@@ -12,7 +12,6 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 
-//class ApidaeUserProvider implements OAuthAwareUserProviderInterface
 final class ApidaeUserProvider implements UserProviderInterface, OAuthAwareUserProviderInterface
 {
     public function __construct(private ApidaeMembres $apidaeMembres)
@@ -59,7 +58,7 @@ final class ApidaeUserProvider implements UserProviderInterface, OAuthAwareUserP
 
     public function supportsClass($class): bool
     {
-        return 'App\\Security\\ApidaeUser' === $class;
+        return 'ApidaeTourisme\\Bootstrap\\ApidaeUser' === $class;
     }
 
     private function getRolesFromUserApidae(array $userApidae)

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security;
+namespace ApidaeTourisme\Bootstrap;
 
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Contracts\HttpClient\ResponseInterface;

@@ -6,7 +6,7 @@ hwi_oauth:
     resource_owners:
         apidae:
             type: oauth2
-            class: \App\Security\ApidaeResourceOwner
+            class: ApidaeTourisme\Bootstrap\ApidaeResourceOwner
             client_id: "%env(APIDAE_SSO_ID)%"
             client_secret: "%env(APIDAE_SSO_SECRET)%"
             access_token_url: "%env(APIDAE_SSO_URLACCESSTOKEN)%"
