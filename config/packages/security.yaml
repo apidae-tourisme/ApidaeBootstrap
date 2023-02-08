@@ -6,7 +6,7 @@ security:
     providers:
         users_in_memory: { memory: null }
         app_user_provider:
-            id: ApidaeTourisme\ApidaeUserProvider
+            id: ApidaeTourisme\BootstrapBundle\ApidaeUserProvider
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -23,7 +23,7 @@ security:
                 failure_path: /login
 
                 oauth_user_provider:
-                    service: ApidaeTourisme\ApidaeUserProvider
+                    service: ApidaeTourisme\BootstrapBundle\ApidaeUserProvider
 
             logout:
                 path: /logout
