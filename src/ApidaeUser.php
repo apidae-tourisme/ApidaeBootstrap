@@ -1,6 +1,6 @@
 <?php
 
-namespace ApidaeTourisme\Bootstrap;
+namespace ApidaeTourisme;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 

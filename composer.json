@@ -39,7 +39,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ApidaeTourisme\\Bootstrap\\": "src/"
+            "ApidaeTourisme\\": "src/"
         }
     },
     "autoload-dev": {
@@ -91,7 +91,7 @@
         "symfony/http-client": "6.2.*",
         "symfony/intl": "6.2.*",
         "symfony/mailer": "6.2.*",
-        "symfony/maker-bundle": "^1.0",
+        "symfony/maker-bundle": "^1.48",
         "symfony/monolog-bundle": "^3.8",
         "symfony/notifier": "6.2.*",
         "symfony/phpunit-bridge": "^6.2",

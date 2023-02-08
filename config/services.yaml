@@ -20,7 +20,7 @@ services:
             - "../src_dev/Entity/"
             - "../src_dev/Kernel.php"
 
-    ApidaeTourisme\Bootstrap\:
+    ApidaeTourisme\:
         resource: "../src/"
 
     # add more service definitions when explicit configuration is needed
