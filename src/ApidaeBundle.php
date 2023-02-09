@@ -11,6 +11,6 @@ class ApidaeBundle extends AbstractBundle
     public function loadExtension(array $config, ContainerConfigurator $containerConfigurator, ContainerBuilder $containerBuilder): void
     {
         // load an XML, PHP or Yaml file
-        $containerConfigurator->import('../resources/services.xml');
+        $containerConfigurator->import('../resources/services.yaml');
     }
 }
