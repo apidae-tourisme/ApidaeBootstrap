@@ -1,11 +1,9 @@
 <?php
 
-namespace ApidaeTourisme\BootstrapBundle;
+namespace ApidaeTourisme;
 
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-
-
 use HWI\Bundle\OAuthBundle\Security\OAuthErrorHandler;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\HttpClient\Exception\JsonException;

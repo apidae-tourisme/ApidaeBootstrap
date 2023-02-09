@@ -1,6 +1,6 @@
 <?php
 
-namespace ApidaeTourisme\BootstrapBundle ;
+namespace ApidaeTourisme ;
 
 use Exception;
 use PierreGranger\ApidaeMembres;
@@ -58,7 +58,7 @@ final class ApidaeUserProvider implements UserProviderInterface, OAuthAwareUserP
 
     public function supportsClass($class): bool
     {
-        return 'ApidaeTourisme\\BootstrapBundle\\ApidaeUser' === $class;
+        return 'ApidaeTourisme\\ApidaeUser' === $class;
     }
 
     private function getRolesFromUserApidae(array $userApidae)
