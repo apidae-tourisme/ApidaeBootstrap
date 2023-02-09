@@ -39,7 +39,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ApidaeTourisme\\BootstrapBundle\\": "src/"
+            "ApidaeTourisme\\ApidaeBundle\\": "src/"
         }
     },
     "autoload-dev": {
