@@ -6,6 +6,7 @@
             <strong>{{ app_title }}{% if app_env != 'prod' %}.{{ app_env }}{% endif %}</strong>
         {% endif %}
     </a>
+    {% block nav %}
     <ul class="nav nav-pills col-12 col-md-auto mb-2 justify-content-center mb-md-0">
         {% if nav is defined and nav is iterable %}
             {% for path, name in nav %}
@@ -15,5 +16,6 @@
             {% endfor %}
         {% endif %}
     </ul>
+    {% endblock %}
     {% include 'header.user.html.twig' %}
 </header>
