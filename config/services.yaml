@@ -22,7 +22,7 @@ services:
             - "../src_dev/Kernel.php"
 
     apidaebootstrap:
-        namespace: ApidaeTourisme\
+        namespace: ApidaeTourisme\BootstrapBundle\
         resource: "../src/"
 
     # add more service definitions when explicit configuration is needed
