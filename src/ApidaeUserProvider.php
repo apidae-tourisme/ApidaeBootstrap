@@ -34,7 +34,9 @@ final class ApidaeUserProvider implements UserProviderInterface, OAuthAwareUserP
         $localApidaeUser->setFirstname($remoteApidaeUser['firstName']) ;
         $localApidaeUser->setLastname($remoteApidaeUser['lastName']) ;
         $localApidaeUser->setType($remoteApidaeUser['type']) ;
-        $localApidaeUser->setProfession($remoteApidaeUser['profession']) ;
+        if (isset($remoteApidaeUser['profession'])) {
+            $localApidaeUser->setProfession($remoteApidaeUser['profession']) ;
+        }
         $localApidaeUser->setGravatar('https://www.gravatar.com/avatar/'.md5($remoteApidaeUser['contact']['eMail'])) ;
         $localApidaeUser->setRoles($this->getRolesFromUserApidae($remoteApidaeUser)) ;
 
