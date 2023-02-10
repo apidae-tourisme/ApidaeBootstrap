@@ -1,0 +1,19 @@
+{% if var is iterable %}
+    <table class="table">
+        {% for k, v in var %}
+            <tr>
+                <th>{{ k }}</th>
+                <td>
+                {% set v = castArray(v) %}
+                    {% if v is iterable %}
+                        {% include 'utils/var.html.twig' with {  var : v } %}
+                    {% else %}
+                        {{ dump(v) }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% elseif var is not null %}
+    {{ dump(var) }}
+{% endif %}

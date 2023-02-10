@@ -1,0 +1,24 @@
+{% if oui is not defined %} {% set oui = 'Oui' %} {% endif %}
+{% if non is not defined %} {% set non = 'Non' %} {% endif %}
+{% if vide is not defined %} {% set vide = 'Non renseigné' %} {% endif %}
+
+{% set cOui = 'success' %}
+{% set cNon = 'danger' %}
+{% set cVide = 'warning' %}
+
+{% if color is defined and color == 'reversed' %}
+    {% set cOui = 'danger' %}
+    {% set cNon = 'success' %}
+{% endif %}
+
+{% if var is defined %}
+    {% if var == true %}
+            <span class="badge badge-{{ cOui }}">{{ oui }}</span>
+    {% else %}
+        {% if vide is defined and var is null %}
+            <span class="badge badge-{{ cVide }}">{{ vide }}</span>
+        {% else %}
+            <span class="badge badge-{{ cNon }}">{{ non }}</span>
+        {% endif %}
+    {% endif %}
+{% endif %}

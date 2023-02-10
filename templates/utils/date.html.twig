@@ -1,0 +1,44 @@
+    {% set difference_obj = date("now").diff(date(date)) %}
+    {% set difference = difference_obj.days %}
+
+    {% if date is not null %}
+    
+    {% if datetype is defined and datetype == 'expiration' %}
+
+        {% if difference_obj.invert == 1 %}
+            {% set difference = - difference_obj.days %}
+        {% endif %}
+
+        {% set class = 'success' %}
+        {% if difference < 0 %}
+            {% set class = 'danger' %}
+        {% elseif difference < 30 %}
+            {% set class = 'warning' %}
+        {% endif %}
+
+    {% else %}
+
+        {% set class = 'danger' %}
+        {% if difference < 30 %}
+            {% set class = 'success' %}
+        {% elseif difference < 365 %}
+            {% set class = 'warning' %}
+        {% endif %}
+
+    {% endif %}
+
+    {% set format = 'd/m/Y' %}
+    {% if hour is defined or hours is defined %}{% set format = 'd/m/Y H:i' %}{% endif %}
+    {% if second is defined or seconds is defined %}{% set format = 'd/m/Y H:i:s' %}{% endif %}
+
+    {% if balise is not defined %}
+    {% set balise = 'small' %}
+    {% endif %}
+
+    <{{ balise}} class="text-nowrap" title="{{ date|date(format) }}">{{ date|date(format) }}
+    {% if difference != 0 %}
+        <span class="badge badge-{{ class }}">{{ difference }} jour{% if difference > 1 %}s{% endif %}</span>
+    {% endif %}
+    </{{ balise }}>
+
+    {% endif %}

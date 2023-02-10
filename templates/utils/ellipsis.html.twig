@@ -1,0 +1,13 @@
+{% if type is not defined or type is null %}
+    {% set type = 'raw' %}
+{% endif %}
+
+{% if description is null and result.description is not null %}
+    {% set description = result.description %}
+{% endif %}
+
+{% if description is not null %}
+    <div class="ellipsis">
+        {% if type == 'raw' %} {{ description|raw }} {% endif %}
+    </div>
+{% endif %}

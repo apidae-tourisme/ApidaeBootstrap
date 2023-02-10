@@ -1,0 +1,18 @@
+{% if nb is not defined %}
+
+    {% if var is defined and var is iterable %}
+        {% set nb = var|length %}
+    {% elseif results is defined and results is iterable %}
+        {% set nb = results|length %}
+    {% endif %}
+
+{% endif %}
+
+{% if nb is defined %}
+
+    {% set badge = 'secondary' %}
+    {% if nb > 0 %} {% set badge = 'success' %}{% endif %}
+
+    <span class="badge badge-{{ badge }}">{{ nb }}</span>
+
+{% endif %}
