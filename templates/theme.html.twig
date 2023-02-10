@@ -37,40 +37,26 @@
             {% block header %}{% include 'header.html.twig' %}{% endblock %}
             {% block container %}
             <div class="container-fluid">
-                <div class="row">
-                    {% block sidebarMenu %}
-                    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block">
-                        <div class="sidebar-sticky pt-3">
-                            {% block sidebarMenuUl %}
-                                {% include 'demo/siteBarMenu.html.twig' %}
-                            {% endblock %}
-                        </div>
-                    </nav>
-                    {% endblock %}
-                    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-                        {% block breadcrumb %}
-                            {% if breadcrumb is defined %}
-                                {% include 'breadcrumb.html.twig' %}
-                            {% else %}
-                                {% include 'demo/breadcrumb.html.twig' %}
-                            {% endif %}
+                {% if sidebarMenu is defined and sidebarMenu == true %}
+                    <div class="row">
+                        {% block sidebarMenu %}
+                            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block">
+                                <div class="sidebar-sticky pt-3">
+                                    {% block sidebarMenuUl %}
+                                        {% include 'demo/siteBarMenu.html.twig' %}
+                                    {% endblock %}
+                                </div>
+                            </nav>
                         {% endblock %}
-                        {% block h1 %}
-                            <h1>{{ titre|default(app.request.get('_route')|trans) }}</h1>
-                        {% endblock %}
-                        {% block alerts %}
-                            {% include 'alerts.html.twig' %}
-                        {% endblock %}
-                        {% block main %}{% endblock %}
-                        {% block helper %}{% endblock %}
-                        {% if debug is defined %}
-                            {{ dump(debug) }}
-                        {% endif %}
-                        {% if gql is defined %}
-                            <pre style="font-size:.6em;max-height:80px;overflow:auto;"><code>{{ gql }}</code></pre>
-                        {% endif %}
+                        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                            {% include 'main.html.twig' %}
+                        </main>
+                    </div>
+                {% else %}
+                    <main role="main" class="px-md-4">
+                        {% include 'main.html.twig' %}
                     </main>
-                </div>
+                {% endif %}
             </div>
             {% endblock %}
         {% endblock %}
