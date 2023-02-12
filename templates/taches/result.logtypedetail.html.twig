@@ -1,0 +1,32 @@
+    {% if logs is defined %}
+
+        {% set badgeNB = '' %}
+        {% if logs is iterable and logs|length > 0 %}
+            {% set badgeNB = '<span class="badge badge-'~badge~'">'~logs|length~'</span>' %}
+        {% endif %}
+
+        <span class="badge badge-{{ badge }} details">{{ lib }} {{ badgeNB|raw }}</span>
+        {% if logs is iterable %}
+            <code>
+                <ul>
+                    {% for log in logs %}
+                        {% if log is iterable %}
+                            <ul>
+                            {% for k, v in log %}
+                                <li>
+                                    {% if k matches  '/^\\d+$/' %}{{ k }} :{% endif %}
+                                    {% if v is iterable %}{{ v|json_encode() }}{% else %}{{ v }}{% endif %}
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <li>{{ log }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </code>
+        {% else %}
+            <code>{{ details }}</code>
+        {% endif %}
+        <br />
+    {% endif %}

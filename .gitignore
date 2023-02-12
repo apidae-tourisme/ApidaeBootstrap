@@ -2,6 +2,7 @@ node_modules
 dist/*
 !dist/index.html
 .vscode/
+logs/
 
 ###> symfony/framework-bundle ###
 /.env.local

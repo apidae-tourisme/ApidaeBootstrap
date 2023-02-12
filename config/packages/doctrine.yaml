@@ -16,6 +16,11 @@ doctrine:
                 dir: "%kernel.project_dir%/src_dev/Entity"
                 prefix: 'App\Entity'
                 alias: App
+            ApidaeTourisme\ApidaeBundle:
+                is_bundle: false
+                dir: "%kernel.project_dir%/src/Entity"
+                prefix: 'ApidaeTourisme\ApidaeBundle\Entity'
+                alias: ApidaeTourisme\ApidaeBundle
 
 when@test:
     doctrine:

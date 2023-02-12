@@ -1,0 +1,9 @@
+{% if logs is not defined and tache.logs is defined %}{% set logs = tache.logs %}{% endif %}
+
+{% if logs is defined %}
+    {% for type, liste in logs %}
+        {% if liste is iterable and liste|length > 0 %}
+            <span class="badge badge-{{ ('badge_' ~ type)|trans }}">{{ type }} <span class="badge badge-dark">{{ liste|length }}</span></span>
+        {% endif %}
+    {% endfor %}
+{% endif %}

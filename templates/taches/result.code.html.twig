@@ -1,0 +1,27 @@
+    {% if details is defined %}
+
+        {% set badgeNB = '' %}
+        {% if details is iterable and details|length > 0 %}
+            {% set badgeNB = '<span class="badge badge-'~badge~'">'~details|length~'</span>' %}
+        {% endif %}
+
+        <span class="badge badge-{{ badge }} details">{{ lib }} {{ badgeNB|raw }}</span>
+        {% if details is iterable %}
+            <code>
+                <ul>
+                    {% for w in details %}
+                        <li>
+                            {% if w is iterable %}
+                                {{ w|json_encode }}
+                            {% else %}
+                                {{ w }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </code>
+        {% else %}
+            <code>{{ details }}</code>
+        {% endif %}
+        <br />
+    {% endif %}

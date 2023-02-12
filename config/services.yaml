@@ -17,13 +17,15 @@ services:
         namespace: App\
         resource: "../src_dev/"
         exclude:
-            - "../src_dev/DependencyInjection/"
             - "../src_dev/Entity/"
             - "../src_dev/Kernel.php"
 
     apidaebootstrap:
         namespace: ApidaeTourisme\ApidaeBundle\
         resource: "../src/"
+        exclude:
+            - "../src/Entity/"
+            - "../src/Kernel.php"
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

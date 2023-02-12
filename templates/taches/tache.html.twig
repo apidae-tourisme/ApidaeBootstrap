@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+<h1>{{ tache.id }} - {{ tache.tache }}</h1>
+{# {% if ( tache.userEmail == app.user.id ) %} <a class="tache delete" href="{{ path('taches_delete',{'id':tache.id}) }}"><i class="fas fa-trash"></i></a>{% endif %} #}
+
+<ul>
+    <li><i class="fas fa-plus-circle" title="Créée"></i> &nbsp; <small class="creationdate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.creationdate, balise : 'span' } %}</small></li>
+    <li><i class="fas fa-play" title="Commencée"></i> &nbsp; <small class="startdate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.startdate, balise : 'span' } %}</small></li>
+    <li><i class="fas fa-stop" title="Terminée"></i> &nbsp; <small class="enddate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.enddate, balise : 'span' } %}</small></li>
+
+    <li>Utilisateur : {{ tache.userEmail }}</li>
+    {% if tache.fichier is not null %}
+    <li>
+        <small><a href="{{ path('taches_download', {'id' : tache.id }) }}">{{ tache.fichier }}</a></small>
+    </li>
+    {% endif %}
+    <li>Status : 
+        {% include 'taches/status.html.twig' %}
+    </li>
+    <li>Paramètres : 
+        <code class="json">{{ tache.parametres|json_encode(constant('JSON_PRETTY_PRINT')) }}</code>
+    </li>
+</ul>
+
+<h2>Logs</h2>
+{% include 'taches/result.html.twig' %}
+<hr />
+{% if tache.result is defined and tache.result is iterable and tache.result[0][0] is defined %}
+    <ul>
+    {% for log in tache.result %}
+        {% set details = null %}
+        {% if log[2] is defined %}{% set details = log[2] %}{% endif %}
+        <li>
+            <span class="badge badge-{{ ('badge_' ~ log[0])|trans }}">{{ log[0] }}</span>
+            <strong>{{ log[1] }}</strong> 
+            {% if details is not null and ( ( details is iterable and ( details|length > 0 ) ) or details is not iterable ) %}
+                <code style="font-size:.8em;">{% if details is iterable %}{{ details|json_encode(constant('JSON_PRETTY_PRINT')) }}{% else %}{{ details }}{% endif %}</code>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<style>code.pre { white-space:pre; }</style>
+<script>
+    jQuery('code').on('click',function(){
+        jQuery(this).toggleClass('pre') ;
+    }) ;
+</script>
+{% endblock %}

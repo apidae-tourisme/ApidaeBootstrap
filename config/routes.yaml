@@ -1,7 +1,13 @@
-controllers:
+controllers_dev:
     resource:
         path: ../src_dev/Controller/
         namespace: App\Controller
+    type: attribute
+
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: ApidaeTourisme\ApidaeBundle\Controller
     type: attribute
 
 apidae_login:
