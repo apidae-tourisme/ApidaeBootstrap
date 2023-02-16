@@ -1,30 +1,11 @@
-
-// @mixin badge-variant-apidae($bg,$light) {
-//     color: $bg;
-//     @if $light {
-//         background-color:$light;
-//     }
-//     @else {
-//         background-color: lighten($bg,40%);
-//     }
-//   }
-  
-//   @each $color, $value in $theme-colors {
-//     .badge-#{$color} {
-//         @include badge-variant($value);
-//         @include badge-variant-apidae($value,map-get($lights,$color));
-//     }
-//   }
-
   @mixin text-block() {
-    background:white;
+    background: white;
     box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, .13), 0 0.3px 0.9px 0 rgba(0, 0, 0, .11);
-    width:100% ; 
-    padding:1.25rem 1.875rem 2.5rem 1.875rem;
+    width: 100%;
+    padding: 1.25rem 1.875rem 2.5rem 1.875rem;
   }
 
-.text-block {
-  padding:1em 2em;
-  @include text-block();
-}
- 
+  .text-block {
+    padding: 1em 2em;
+    @include text-block();
+  }

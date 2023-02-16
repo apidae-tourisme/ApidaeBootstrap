@@ -7,6 +7,8 @@ var tachesPool = [];
 var tachesFails = [];
 var frequence = 5000;
 
+var apidaebundle_taches_path = 'apidaebundle/taches';
+
 var dateFormat = require("dateformat");
 
 var tachesDateOpt = {
@@ -21,7 +23,7 @@ function tacheWatch(id) {
     var status = jQuery('[data-tacheid="' + id + '"] .status:not(.badge)');
 
     var ajax = jQuery.get({
-        url: "/taches/status/" + id
+        url: apidaebundle_taches_path + "/status/" + id
     });
 
     ajax.done(function (data) {
@@ -47,7 +49,7 @@ function tacheWatch(id) {
 function tacheRefresh(id) {
 
     var ajax = jQuery.get({
-        'url': '/taches/status/' + id,
+        'url': apidaebundle_taches_path + '/status/' + id,
         'data': { '_format': 'json' },
         'dataType': 'json'
     });
@@ -58,7 +60,7 @@ function tacheRefresh(id) {
         if (tache.length == 0) return;
 
         if (typeof data.fichier != 'undefined')
-            tache.find('.fichier').html('<small><a href="/taches/download/' + data.id + '">' + data.fichier + '</a></small>');
+            tache.find('.fichier').html('<small><a href="' + apidaebundle_taches_path + '/download/' + data.id + '">' + data.fichier + '</a></small>');
         else tache.find('.fichier').html('');
 
         if (typeof data.result != 'undefined') {
@@ -66,7 +68,7 @@ function tacheRefresh(id) {
             tache.find('.result').html('<pre>' + JSON.stringify(data.result) + '</pre>');
             // Mais on va le MAJ en ajax histoire d'avoir l'affichage classique généré par le template
             jQuery.get({
-                'url': '/taches/result/' + id
+                'url': apidaebundle_taches_path + '/result/' + id
             }, function (data) {
                 tache.find('.result').html(data);
             });
@@ -100,7 +102,7 @@ function tacheRefresh(id) {
 
 function tacheDelete(id) {
     var ajax = jQuery.ajax({
-        'url': '/taches/delete/' + id,
+        'url': apidaebundle_taches_path + '/delete/' + id,
         'data': { 'force': 1 }
     });
     ajax.done(function (data) {
@@ -115,7 +117,7 @@ function tacheDelete(id) {
 
 function tacheStart(id) {
     var ajax = jQuery.ajax({
-        'url': '/taches/start/' + id,
+        'url': apidaebundle_taches_path + '/start/' + id,
         'data': { 'force': 1 }
     });
     ajax.fail(function (data) {
@@ -139,7 +141,7 @@ function tacheStart(id) {
 
 function tacheStop(id) {
     var ajax = jQuery.ajax({
-        'url': '/taches/stop/' + id,
+        'url': apidaebundle_taches_path + '/stop/' + id,
         'data': { 'force': 1 }
     });
     ajax.fail(function (data) {

@@ -6,13 +6,13 @@
         <div class="d-flex"><i class="fas fa-stop" title="Terminée"></i> &nbsp; <small class="enddate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.enddate, balise : 'span' } %}</small></div>
     </td>
     {% if showId is not defined or showId == true %}
-        <th>{{ tache.id }}</th>
+        <th><code>{{ tache.id }}</code></th>
     {% endif %}
     {% if showuserEmail is not defined or showuserEmail == true %}
         <td>{{ tache.userEmail }}</td>
     {% endif %}
     {% if showTache is not defined or showTache == true %}
-        <td>{{ tache.tache }}</td>
+        <td><code>{{ tache.tache }}</code></td>
     {% endif %}
     {% if showFichier is not defined or showFichier == true %}
         <td class="fichier">

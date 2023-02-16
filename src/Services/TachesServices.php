@@ -9,12 +9,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\KernelInterface;
 use ApidaeTourisme\ApidaeBundle\Command\TacheCommand;
 use ApidaeTourisme\ApidaeBundle\Command\TachesCommand;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,9 +40,10 @@ class TachesServices
         protected KernelInterface $kernel,
         protected ParameterBagInterface $params,
         protected Filesystem $filesystem,
-        protected SluggerInterface $slugger
+        protected SluggerInterface $slugger,
+        protected EntityManager $entityManager
     ) {
-        $this->dossierTaches = $this->kernel->getProjectDir() . '/public/taches/';
+        $this->dossierTaches = $this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') ;
         $this->logger = $tachesLogger ;
     }
 
@@ -49,40 +52,41 @@ class TachesServices
         return $this->dossierTaches;
     }
 
-    public function add(array $t)
+    /**
+     * Ajoute une tâche TO_RUN en bdd
+     */
+    public function add(Tache $tache, ?array $params): int
     {
         $tache = new Tache();
 
-        if (!isset($t['userEmail'])) {
+        if (!isset($params['userEmail'])) {
             /**
              * @var ApidaeUser $user
              */
             $user = $this->security->getUser();
             $tache->setUserEmail($user->getEmail());
         } else {
-            $tache->setUserEmail($t['utilisateurEmail']);
+            $tache->setUserEmail($params['utilisateurEmail']);
         }
 
-        $tache->setTache($t['tache']);
+        $tache->setTache($params['tache']);
 
-        if (isset($t['parametres'])) {
-            $tache->setParametres($t['parametres']);
+        if (isset($params['parametres'])) {
+            $tache->setParametres($params['parametres']);
         }
-        if (isset($t['parametresCaches'])) {
-            $tache->setParametresCaches($t['parametresCaches']);
+        if (isset($params['parametresCaches'])) {
+            $tache->setParametresCaches($params['parametresCaches']);
         }
-        //if (isset($t['status'])) $tache->setStatus($t['status']);
-        if (isset($t['result'])) {
-            $tache->setResult($t['result']);
+        //if (isset($params['status'])) $tache->setStatus($params['status']);
+        if (isset($params['result'])) {
+            $tache->setResult($params['result']);
         }
-
 
         $tache->setCreationdate(new \DateTime());
 
         $tache->setStatus(Tache::STATUS['TO_RUN']);
 
-        $this->em->persist($tache);
-        $this->em->flush();
+        $this->save($tache);
 
         $id = $tache->getId();
 
@@ -99,19 +103,19 @@ class TachesServices
          * 2 cas : le fichier est déjà créé et déjà mis à sa place.
          */
         if (
-            isset($t['fichier'])
-            && gettype($t['fichier']) == 'object'
-            && get_class($t['fichier']) == 'Symfony\Component\HttpFoundation\File\UploadedFile'
+            isset($params['fichier'])
+            && gettype($params['fichier']) == 'object'
+            && get_class($params['fichier']) == 'Symfony\Component\HttpFoundation\File\UploadedFile'
         ) {
-            if (!in_array($t['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
+            if (!in_array($params['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
                 $this->logger->error(__METHOD__ . ': Type de fichier non autorisé');
                 return false;
             }
-            $originalFilename = pathinfo($t['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
-            $filename = $this->slugger->slug($originalFilename) .  '.' . $t['fichier']->guessExtension();
+            $originalFilename = pathinfo($params['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
+            $filename = $this->slugger->slug($originalFilename) .  '.' . $params['fichier']->guessExtension();
 
             try {
-                $t['fichier']->move(
+                $params['fichier']->move(
                     $tachePath,
                     $filename
                 );
@@ -121,15 +125,13 @@ class TachesServices
             }
 
             $tache->setFichier($filename);
-            $this->em->persist($tache);
-            $this->em->flush();
+            $this->save($tache);
         }
 
         return $id;
     }
 
     /**
-     * @see https://symfony.com/doc/current/components/process.html
      * Lance une tâche en process (tâche de fond)
      * Une fois lancée, la tâche renseigne le pid du process en base
      */
@@ -144,10 +146,12 @@ class TachesServices
         $cl = $path . ' '.TacheCommand::getDefaultName().' ' . $tache->getId();
         $this->logger->info(__METHOD__ . ' => new Process ' . $cl);
 
-        /*
-        //$process = new Process([$path, $tache->getTache()]);
-        $process = new Process($cl);
-        $process->start();
+
+        /**
+         * @see https://symfony.com/doc/current/components/process.html
+         * $process = new Process([$path, $tache->getTache()]);
+         * $process = new Process($cl);
+         * $process->start();
         */
         /**
          * @see https://stackoverflow.com/a/58765200/2846837
@@ -163,33 +167,28 @@ class TachesServices
         $tache->setPid($pid);
         $tache->setEndDate(null);
         $tache->setProgress(null);
-        $this->em->persist($tache);
-        $this->em->flush();
+        $this->save($tache);
 
         return $pid;
     }
 
     /**
-     * @todo : voir comment tuer un process à partir du pid
-     * @warning : pas sûr que ce soit facile, il faut déjà que l'utilisateur ayant lancé le process soit le même que celui qui lance le stop
-     *  et il faut que le processus tourne toujours, sauf qu'il a pu lancer des sous-process et ne plus tourner lui même alors que la tâche n'est pas terminée
+     * Stoppe une tâche par un kill -9 en se basant sur son $tache->getPid()
      */
-    public function stop(int $tacheId)
+    public function stop(Tache $tache): array
     {
+        /**
+         * @todo : voir comment tuer un process à partir du pid
+         * @warning : pas sûr que ce soit facile, il faut déjà que l'utilisateur ayant lancé le process soit le même que celui qui lance le stop
+         *  et il faut que le processus tourne toujours, sauf qu'il a pu lancer des sous-process et ne plus tourner lui même alors que la tâche n'est pas terminée
+         */
         $response = [];
-
-        $tache = $this->tacheRepository->getTacheById($tacheId);
-
-        if (!$tache) {
-            $response['error'] = 'La tâche ' . $tacheId . ' est introuvable en base';
-            return $response;
-        }
 
         $killable_status = [
             Tache::STATUS['RUNNING']
         ];
 
-        $realPid = $this->getPid($tacheId);
+        $realPid = $this->getPid($tache->getId());
         if (!$realPid) {
             $response['error'] = 'La tâche ne semble pas être en cours d\'éxécution';
             return $response;
@@ -208,7 +207,7 @@ class TachesServices
                 $response = ['error' => 'kill -9 failed'];
             }
         } else {
-            $response['error'] = 'La tâche ' . $tacheId . ' n\'est pas en état [' . implode(',', $killable_status) . '] (' . $tache->getStatus() . ')';
+            $response['error'] = 'La tâche ' . $tache->getId() . ' n\'est pas en état [' . implode(',', $killable_status) . '] (' . $tache->getStatus() . ')';
         }
 
         return $response;
@@ -217,7 +216,7 @@ class TachesServices
     /**
      * Exécute la tâche
      */
-    public function exec(Tache $tache): int|bool
+    public function run(Tache $tache): int|bool
     {
         $ret = false ;
         if (preg_match("#^([a-zA-Z]+):([a-zA-Z]+)$#", $tache->getTache(), $match)) {
@@ -263,8 +262,7 @@ class TachesServices
             $tacheId = $tache->getId();
             if (!$this->running($tacheId)) {
                 $tache->setStatus(Tache::STATUS['INTERRUPTED']);
-                $this->em->persist($tache);
-                $this->em->flush();
+                $this->save($tache);
             }
         }
     }
@@ -301,8 +299,7 @@ class TachesServices
         }
 
         $tache->setProgress($progress);
-        $this->em->persist($tache);
-        $this->em->flush();
+        $this->save($tache);
     }
 
     public function delete(int $tacheId)
@@ -312,8 +309,7 @@ class TachesServices
             return false;
         }
         $this->filesystem->remove($this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') . $tache->getId());
-        $this->em->remove($tache);
-        $this->em->flush();
+        $this->save($tache);
         return true;
     }
 
@@ -333,5 +329,14 @@ class TachesServices
 
         $this->monitorRunningTasks();
         return $taches;
+    }
+
+    /**
+     * persist & flush
+     */
+    public function save(Tache $tache): void
+    {
+        $this->entityManager->persist($tache);
+        $this->entityManager->flush();
     }
 }

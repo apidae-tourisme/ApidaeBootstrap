@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% set body_class = 'login' %}
+{% block body %}
+
+    <div class="container d-flex align-items-start flex-column align-items-center" style="margin:auto 0;">
+
+        <div style="height:80px;margin-bottom:40px;">{% include 'logo.html.twig' %}</div>
+
+        <a class="btn btn-primary btn-block align-middle" href="{{ path('hwi_oauth_service_redirect', {service:'apidae'}) }}">
+            <span>Identification avec Apidae</span>
+        </a>
+
+    </div>
+
+{% endblock %}

@@ -65,4 +65,19 @@ class TacheRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getTachesRunningNumber()
+    {
+        return $this->getTachesNumberByStatus('RUNNING') ;
+    }
+
+    public function getTachesNumberByStatus(string $status)
+    {
+        return $this->createQueryBuilder('i')
+            ->select('count(t.id)')
+            ->andWhere('t.status = :status')
+            ->setParameter('status', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

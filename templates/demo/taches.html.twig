@@ -1,0 +1,41 @@
+{% extends 'demo/index.html.twig' %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="{{ path('app_index') }}">Home</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{{ path('app_taches') }}">Tâches</a>
+    </li>
+</ol>
+{% endblock %}
+
+{% set titre = 'Tâches' %}
+
+{% block main %}
+
+    <div class="alert alert-info">
+        Page de démo présentant le fonctionnement des tâches avec ApidaeBundle.<br />
+        Un clic sur le bouton "Créer un tâche" permettra de rajouter une tâche au gestionnaire de tâches :<br />
+        <code><pre>$tache = [
+    'tache' => 'App\\Services\\DemoService::demo',
+    'parametres' => ['param1' => '...'],
+];
+$tache_id = $tachesServices->add($tache);</pre></code>
+
+        Les paramètres dépendent du type de tâche ajoutée (ici <code>App\\Services\\DemoService::demo</code>) : selon les cas il peut être nécessaire de proposer des options en IHM à l'utilisateur.
+        <br />
+        La tâche est ajoutée en base de donnée avec un status <code>TO_RUN</code>, mais pas exécutée.<br />
+        Elle sera exécutée :<br />
+        <ul>
+            <li>Par le gestionnaire de tâche <code>apidae:taches:start</code>, qui est sensé se déclencher via une tâche cron et cherche à traiter toutes les tâches en attente</li>
+            <li>En ligne de commande <code>apidae:tache:run X</code> où X est l'identifiant de la tâche qu'on souhaite exécuter</li>
+            <li>Par un clic sur <i class="fas fa-play"></i>, qui lancera la tâche directement, sans passer par une commande. Cette dernière option est discutable, une évolution à envisager serait de ne proposer ce bouton que pour les tâches qui n'ont pas d'impact sur les performances (pourquoi pas un paramètre static à définir dans le service <code>App\\Services\\DemoService::demo</code> ?).</li>
+        </ul>
+    </div>
+
+    <a class="btn btn-primary" href="{{ path('app_taches',{'action' : 'creer_tache', 'param' : 'value'}) }}">Créer une tâche</a>
+    
+    {% include 'taches/table.html.twig' %}
+{% endblock %}

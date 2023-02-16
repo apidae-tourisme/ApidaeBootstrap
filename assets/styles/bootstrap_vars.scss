@@ -7,7 +7,7 @@ $boutondor: #FCEF8B;
 
 $body-color: rgb(50, 49, 48);
 $body-bg: #f7f7f7;
-$border-radius: 2em;
+$border-radius: .2em;
 $success: $vertdeau;
 $primary: $bleuroi;
 $warning: $boutondor;
@@ -17,4 +17,5 @@ $nav_height : 4.375rem;
 
 $lights: (
     warning: $warning,
-    success: darken($vertdeau, 40%));
+    success: darken($vertdeau, 40%)
+);

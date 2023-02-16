@@ -2,10 +2,10 @@
 
         {% set badgeNB = '' %}
         {% if logs is iterable and logs|length > 0 %}
-            {% set badgeNB = '<span class="badge badge-'~badge~'">'~logs|length~'</span>' %}
+            {% set badgeNB = '<span class="badge bg-'~badge~'">'~logs|length~'</span>' %}
         {% endif %}
 
-        <span class="badge badge-{{ badge }} details">{{ lib }} {{ badgeNB|raw }}</span>
+        <span class="badge bg-{{ badge }} details">{{ lib }} {{ badgeNB|raw }}</span>
         {% if logs is iterable %}
             <code>
                 <ul>

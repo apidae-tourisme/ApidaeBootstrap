@@ -23,7 +23,8 @@ use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 class TachesCommand extends Command
 {
     protected LoggerInterface $logger;
-    protected $sleepTime = 7;
+    public const SLEEPTIME = 7;
+    public const MAX_RUNNERS = 5 ;
 
     public function __construct(
         LoggerInterface $logger,
@@ -36,20 +37,42 @@ class TachesCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
-    {
-    }
-
     /**
-     * @todo Lancer la plus ancienne tâche au statut TO_RUN
+     * Est-ce qu'on exécute la tâche dans ce processus ?
+     *  Pour :
+     *  Contre :
+     *      Si la tâche plante, elle fait planter le gestionnaire
+     *      On se retrouve avec 2 façons différentes d'exécuter une même tâche
+     *
+     * Ou est-ce qu'on lance un processus apidaebundle:tache:run ?
+     *  Pour :
+     *      1 process par tâche
+     *  Contre :
+     *
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $next = $this->tacheRepository->getTacheToRun();
-        if ($next) {
-            $this->tachesServices->start($next);
-            $this->tachesServices->monitorRunningTasks();
+        $this->logger->info('Starting '.self::getDefaultName()) ;
+
+        $this->tachesServices->monitorRunningTasks() ;
+        $running = $this->tacheRepository->getTachesRunningNumber() ;
+
+        if ($running > self::MAX_RUNNERS) {
+            $this->logger->info($running . ' tâches sont déjà en cours (max: '.self::FAILURE.')... aucune autre tâche ne sera lancée') ;
+        } else {
+            $next = $this->tacheRepository->getTacheToRun();
+            if ($next) {
+                $this->logger->info('Une tâche en attente va être exécutée : tachesServices->start($tache)', [
+                    'id' => $next->getId(),
+                    'tache' => $next->getTache()
+                ]) ;
+                $this->tachesServices->start($next) ;
+            //return $this->tachesServices->execute($next->getId(), $verbose, ['command' => self::getDefaultName(), 'id' => $id]) ;
+            } else {
+                $this->logger->info('Aucune tâche en attente n\'a été trouvée') ;
+            }
         }
+        sleep(self::SLEEPTIME) ;
         return Command::SUCCESS;
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
-#[Route('/apidaebundle', name: 'apidaebundle_taches_')]
+#[Route('/apidaebundle/taches', name: 'apidaebundle_taches_')]
 class TacheController extends AbstractController
 {
     public function __construct(protected TachesServices $tachesServices)
@@ -72,19 +72,20 @@ class TacheController extends AbstractController
     #[Route('/start/{id}', name: 'start')]
     public function start(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository)
     {
-        $pid = $tachesServices->start($id, $request->get('force') == true);
         $tache = $tacheRepository->findOneBy(['id' => $id]);
+        $pid = $tachesServices->start($tache, $request->get('force') == true);
         return new JsonResponse([
-            'id' => (int)$id,
+            'id' => (int)$tache->getId(),
             'pid' => $pid,
             'startdate' => $tache->getStartDate()
         ]);
     }
 
     #[Route('/stop/{id}', name: 'stop')]
-    public function stop(string $id, Request $request, TachesServices $tachesServices)
+    public function stop(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository)
     {
-        return new JsonResponse($tachesServices->stop($id));
+        $tache = $tacheRepository->findOneBy(['id' => $id]);
+        return new JsonResponse($tachesServices->stop($tache));
     }
 
     #[Route('/delete/{id}', name: 'delete')]

@@ -1,10 +1,10 @@
 {% if badge is defined %}
 
-    {% if nb > 0 %}<span class="badge badge-{{ badge }}">{{ nb }}</span>{% endif %}
+    {% if nb > 0 %}<span class="badge bg-{{ badge }}">{{ nb }}</span>{% endif %}
 
 {% else %}
 
-    {% if nb == 1 %}<span class="badge badge-warning">1</span>{% endif %}
-    {% if nb > 1 %}<span class="badge badge-danger">{{ nb }}</span>{% endif %}
+    {% if nb == 1 %}<span class="badge bg-warning">1</span>{% endif %}
+    {% if nb > 1 %}<span class="badge bg-danger">{{ nb }}</span>{% endif %}
 
 {% endif %}

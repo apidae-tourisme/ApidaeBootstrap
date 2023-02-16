@@ -3,7 +3,7 @@
 {% if logs is defined %}
     {% for type, liste in logs %}
         {% if liste is iterable and liste|length > 0 %}
-            <span class="badge badge-{{ ('badge_' ~ type)|trans }}">{{ type }} <span class="badge badge-dark">{{ liste|length }}</span></span>
+            <span class="badge bg-{{ ('badge_' ~ type)|trans }}">{{ type }} <span class="badge bg-dark">{{ liste|length }}</span></span>
         {% endif %}
     {% endfor %}
 {% endif %}

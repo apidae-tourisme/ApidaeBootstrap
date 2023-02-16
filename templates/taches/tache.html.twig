@@ -1,7 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{% set titre = tache.id ~ ' ' ~tache.tache %}
+
 {% block main %}
-<h1>{{ tache.id }} - {{ tache.tache }}</h1>
 {# {% if ( tache.userEmail == app.user.id ) %} <a class="tache delete" href="{{ path('apidaebundle_taches_delete',{'id':tache.id}) }}"><i class="fas fa-trash"></i></a>{% endif %} #}
 
 <ul>
@@ -32,7 +33,7 @@
         {% set details = null %}
         {% if log[2] is defined %}{% set details = log[2] %}{% endif %}
         <li>
-            <span class="badge badge-{{ ('badge_' ~ log[0])|trans }}">{{ log[0] }}</span>
+            <span class="badge bg-{{ ('badge_' ~ log[0])|trans }}">{{ log[0] }}</span>
             <strong>{{ log[1] }}</strong> 
             {% if details is not null and ( ( details is iterable and ( details|length > 0 ) ) or details is not iterable ) %}
                 <code style="font-size:.8em;">{% if details is iterable %}{{ details|json_encode(constant('JSON_PRETTY_PRINT')) }}{% else %}{{ details }}{% endif %}</code>

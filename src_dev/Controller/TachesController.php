@@ -15,9 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
-class DemoController extends AbstractController
+class TachesController extends AbstractController
 {
-    #[Route('/demo', name: 'app_demo')]
+    #[Route('/taches', name: 'app_taches')]
     public function demo(Request $request, TacheRepository $tacheRepository, TachesServices $tachesServices)
     {
         $action = $request->get('action') ;
@@ -29,16 +29,15 @@ class DemoController extends AbstractController
                 'var2' => ['a','b','c']
             ] ;
 
-            $tache = [
-                'tache' => 'App\\Services\\DemoService::demo',
-                'parametres' => $parametres,
-                //'fichier' => $data['fichier'],
-                //'parametresCaches' => ['tokenSSO' => $user->getApidaeToken()]
-            ];
+            $tache = new Tache() ;
+            $tache->setTache('App\\Services\\DemoService::demo') ;
+            $tache->setParametres($parametres) ;
+            //$tache->setFichier($data['fichier']) ;
+            //$tache->setParametresCaches'(['tokenSSO' => $user->getApidaeToken()]) ;
             $tache_id = $tachesServices->add($tache);
         }
 
         $taches = $tacheRepository->findAll() ;
-        return $this->render('demo/demo.html.twig', ['taches' => $taches, 'tache' => $tache]) ;
+        return $this->render('demo/taches.html.twig', ['taches' => $taches, 'tache' => $tache]) ;
     }
 }

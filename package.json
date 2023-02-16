@@ -38,6 +38,7 @@
     "core-js": "^3.27.2",
     "datatables": "^1.10.18",
     "dateformat": "^5.0.3",
+    "dotenv": "^16.0.3",
     "jquery": "^3.6.0"
   },
   "devDependencies": {

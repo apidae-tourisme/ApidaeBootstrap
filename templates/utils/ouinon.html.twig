@@ -13,12 +13,12 @@
 
 {% if var is defined %}
     {% if var == true %}
-            <span class="badge badge-{{ cOui }}">{{ oui }}</span>
+            <span class="badge bg-{{ cOui }}">{{ oui }}</span>
     {% else %}
         {% if vide is defined and var is null %}
-            <span class="badge badge-{{ cVide }}">{{ vide }}</span>
+            <span class="badge bg-{{ cVide }}">{{ vide }}</span>
         {% else %}
-            <span class="badge badge-{{ cNon }}">{{ non }}</span>
+            <span class="badge bg-{{ cNon }}">{{ non }}</span>
         {% endif %}
     {% endif %}
 {% endif %}
