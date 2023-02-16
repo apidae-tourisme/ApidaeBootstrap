@@ -11,7 +11,7 @@
         #[Route('/', name: 'app_index')]
         public function index()
         {
-            return $this->render('base.html.twig');
+            return $this->render('base.html.twig', ['debug' => 'debug']);
         }
 
         #[Route('/login', name: 'app_login')]

@@ -3,45 +3,33 @@
 namespace ApidaeTourisme\ApidaeBundle\Command;
 
 use Psr\Log\LoggerInterface;
-//use App\Service\Taches;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Symfony\Component\Console\Command\Command;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ApidaeTourisme\ApidaeBundle\Services\TachesExecuter;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 
 /**
  * Lance l'exécution d'une tâche définie par son identifiant
  */
-#[AsCommand(name: 'app:tache:run', description: 'Lance une tâche définie par son identifiant')]
+#[AsCommand(name: 'apidae:tache:run', description: 'Lance une tâche définie par son identifiant')]
 class TacheCommand extends Command
 {
     protected LoggerInterface $logger;
-    protected EntityManagerInterface $entityManager;
-    protected Filesystem $filesystem;
-    //protected Taches $taches;
-    protected TachesExecuter $tachesExecuter;
-    protected TacheRepository $tacheRepository;
 
     public function __construct(
         LoggerInterface $tachesLogger,
-        EntityManagerInterface $entityManager,
-        Filesystem $filesystem,
-        //Taches $taches,
-        TachesExecuter $tachesExecuter,
-        TacheRepository $tacheRepository
+        protected EntityManagerInterface $entityManager,
+        protected Filesystem $filesystem,
+        protected TacheRepository $tacheRepository,
+        protected TachesServices $tachesServices
     ) {
-        $this->entityManager = $entityManager;
         $this->logger = $tachesLogger;
-        $this->filesystem = $filesystem;
-        //$this->taches = $taches;
-        $this->tachesExecuter = $tachesExecuter;
-        $this->tacheRepository = $tacheRepository;
         parent::__construct();
     }
 
@@ -56,13 +44,12 @@ class TacheCommand extends Command
         $id = $input->getArgument('id');
         $verbose = $input->getArgument('verbose');
 
-        $logger_key = self::$defaultName . ' ' . $id;
-        $this->logger->info($logger_key);
+        $logger_context = ['command' => self::getDefaultName(), 'id' => $id];
+        $this->logger->info('execute...', $logger_context);
 
         $tache = $this->tacheRepository->getTacheById($id);
         if (!$tache) {
-            $log = $logger_key . ':tache ' . $id . ' non trouvée';
-            $this->logger->info($log);
+            $this->logger->info('tache ' . $id . ' non trouvée', $logger_context);
             return Command::FAILURE;
         }
 
@@ -85,12 +72,18 @@ class TacheCommand extends Command
          */
         $retour = null;
         try {
+            $this->logger->info('Lancement de la tâche (exec)...', $logger_context) ;
             $tache->setResult(['logs' => 'Lancement de la tâche (exec)...']);
-            $retour = $this->tachesExecuter->exec($id);
+            $retour = $this->tachesServices->exec($tache);
             if ($retour === true) {
+                $this->logger->info('exec returned true') ;
                 $completed = true;
-            } elseif ($tache->getVerbose()) {
-                dump($tache->getResult());
+            } else {
+                $this->logger->warning('exec returned !== true') ;
+                $this->logger->warning(json_encode($retour)) ;
+                if ($tache->getVerbose()) {
+                    dump($tache->getResult());
+                }
             }
         } catch (\Exception $e) {
             /**
@@ -98,6 +91,8 @@ class TacheCommand extends Command
              * On ne sait pas s'il y a déjà des logs dans $result, on va donc le récupérer.
              * On ajoute ensuite l'erreur dans les logs ($result)
              */
+            $this->logger->error('Uncatched exception...') ;
+            $this->logger->error($e->getMessage()) ;
             $retour = 'INTERRUPTED';
             $result = $tache->getResult();
             $result[] = ['error', $e->getFile() . ':' . $e->getLine(), $e->getMessage()];
@@ -123,7 +118,7 @@ class TacheCommand extends Command
         $this->entityManager->persist($tache);
         $this->entityManager->flush();
 
-        $this->logger->info($logger_key . ':' . $tache->getStatus());
+        $this->logger->info('STATUS:' . $tache->getStatus(), $logger_context);
         return $completed ? Command::SUCCESS : Command::FAILURE;
     }
 }

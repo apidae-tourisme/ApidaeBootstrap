@@ -3,7 +3,6 @@
 namespace ApidaeTourisme\ApidaeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 
 /**
  * @ORM\Entity(repositoryClass=TacheRepository::class)
@@ -88,6 +87,7 @@ class Tache
 
     private $realStatus;
     private $verbose;
+
 
     public function getId(): ?int
     {
@@ -260,12 +260,18 @@ class Tache
         return $this;
     }
 
-    public function getTachePath()
+    /**
+     * @todo peut-être passer plutôt ça sur les services pour récupérer les paramètres ?
+     *
+     * @return string
+     */
+    public function getTachePath(): string
     {
         if ($this->getId() == null) {
             throw new \Exception('La tâche n\'est pas encore créée (id null)');
         }
-        return $this->kernel->getProjectDir() . $this->container->getParameter('app.task_folder') . $this->getId() . '/';
+        return false ;
+        //return $this->kernel->getProjectDir() . $this->getParameter('app.task_folder') . $this->getId() . '/';
     }
 
     public function get()

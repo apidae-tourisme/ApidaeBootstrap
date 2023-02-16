@@ -2,7 +2,7 @@
 
 {% block main %}
 <h1>{{ tache.id }} - {{ tache.tache }}</h1>
-{# {% if ( tache.userEmail == app.user.id ) %} <a class="tache delete" href="{{ path('taches_delete',{'id':tache.id}) }}"><i class="fas fa-trash"></i></a>{% endif %} #}
+{# {% if ( tache.userEmail == app.user.id ) %} <a class="tache delete" href="{{ path('apidaebundle_taches_delete',{'id':tache.id}) }}"><i class="fas fa-trash"></i></a>{% endif %} #}
 
 <ul>
     <li><i class="fas fa-plus-circle" title="Créée"></i> &nbsp; <small class="creationdate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.creationdate, balise : 'span' } %}</small></li>
@@ -12,7 +12,7 @@
     <li>Utilisateur : {{ tache.userEmail }}</li>
     {% if tache.fichier is not null %}
     <li>
-        <small><a href="{{ path('taches_download', {'id' : tache.id }) }}">{{ tache.fichier }}</a></small>
+        <small><a href="{{ path('apidaebundle_taches_download', {'id' : tache.id }) }}">{{ tache.fichier }}</a></small>
     </li>
     {% endif %}
     <li>Status : 

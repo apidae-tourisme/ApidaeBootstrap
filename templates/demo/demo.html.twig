@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <a class="btn btn-primary" href="{{ path('app_demo',{'action' : 'creer_tache', 'param' : 'value'}) }}">Créer une tâche</a>
+    {% if tache is defined %}
+        {{ dump(tache) }}
+    {% endif %}
+    {% include 'taches/table.html.twig' %}
+{% endblock %}

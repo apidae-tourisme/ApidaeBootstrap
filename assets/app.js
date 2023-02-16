@@ -10,3 +10,18 @@ import './styles/app.scss';
 
 // start the Stimulus application
 import './bootstrap';
+
+import dateformat from 'dateformat';
+
+import 'chosen-js/chosen.jquery.min.js';
+import 'chosen-js/chosen.min.css';
+
+import 'datatables/media/css/jquery.dataTables.min.css';
+import 'datatables/media/js/jquery.dataTables';
+import './form.js';
+import './menu.js';
+import './submenubar.js';
+import './tables.js';
+import './tabs.js';
+import './taches.js';
+import './utils.js';

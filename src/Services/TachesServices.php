@@ -10,6 +10,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Symfony\Component\HttpKernel\KernelInterface;
+use ApidaeTourisme\ApidaeBundle\Command\TacheCommand;
+use ApidaeTourisme\ApidaeBundle\Command\TachesCommand;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
@@ -17,9 +19,10 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class Taches
+class TachesServices
 {
-    protected $dossierTaches;
+    protected string $dossierTaches;
+    protected LoggerInterface $logger ;
 
     public const FICHIERS_EXTENSIONS = ['xlsx', 'ods'];
     public const FICHIERS_MIMES = [
@@ -30,7 +33,7 @@ class Taches
     public function __construct(
         protected EntityManagerInterface $em,
         protected TacheRepository $tacheRepository,
-        protected LoggerInterface $logger,
+        LoggerInterface $tachesLogger,
         protected Security $security,
         protected KernelInterface $kernel,
         protected ParameterBagInterface $params,
@@ -38,6 +41,7 @@ class Taches
         protected SluggerInterface $slugger
     ) {
         $this->dossierTaches = $this->kernel->getProjectDir() . '/public/taches/';
+        $this->logger = $tachesLogger ;
     }
 
     public function getDossierTaches()
@@ -50,6 +54,9 @@ class Taches
         $tache = new Tache();
 
         if (!isset($t['userEmail'])) {
+            /**
+             * @var ApidaeUser $user
+             */
             $user = $this->security->getUser();
             $tache->setUserEmail($user->getEmail());
         } else {
@@ -79,7 +86,7 @@ class Taches
 
         $id = $tache->getId();
 
-        $tachePath = $this->kernel->getProjectDir() . $this->params->get('app.task_folder') . $id . '/';
+        $tachePath = $this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') . $id . '/';
         try {
             $this->filesystem->remove($tachePath);
             $this->filesystem->mkdir($tachePath, 0777);
@@ -126,20 +133,15 @@ class Taches
      * Lance une tâche en process (tâche de fond)
      * Une fois lancée, la tâche renseigne le pid du process en base
      */
-    public function start(int $id, bool $force = false)
+    public function start(Tache $tache, bool $force = false)
     {
-        $tache = $this->tacheRepository->getTacheById($id);
-
-        if (!$tache) {
-            throw new InvalidParameterException('tâche ' . $id . ' introuvable');
-        }
         if (!$force && $tache->getStatus() != Tache::STATUS['TO_RUN']) {
-            throw new \Exception('La tâche ' . $id . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
+            throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
         }
 
         $path = $this->kernel->getProjectDir() . '/bin/console';
 
-        $cl = $path . ' app:tache:run ' . $tache->getId();
+        $cl = $path . ' '.TacheCommand::getDefaultName().' ' . $tache->getId();
         $this->logger->info(__METHOD__ . ' => new Process ' . $cl);
 
         /*
@@ -213,11 +215,45 @@ class Taches
     }
 
     /**
+     * Exécute la tâche
+     */
+    public function exec(Tache $tache): int|bool
+    {
+        $ret = false ;
+        if (preg_match("#^([a-zA-Z]+):([a-zA-Z]+)$#", $tache->getTache(), $match)) {
+            if (!$tache->getVerbose()) {
+                ob_start();
+            }
+            $ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
+            if (!$tache->getVerbose()) {
+                ob_end_clean();
+            }
+        } elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getTache(), $match)) {
+            if (!$tache->getVerbose()) {
+                ob_start();
+            }
+
+            $ret = call_user_func($match[1].'::'.$match[2], $tache, $this->logger);
+            if (!$tache->getVerbose()) {
+                ob_end_clean();
+            }
+        } else {
+            $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getTache().' est incohérence') ;
+        }
+
+        if (! is_int($ret) && ! is_bool($ret)) {
+            $this->logger->error('La valeur retour de '.$tache->getTache().' n\'est pas un integer ou un booléen :(') ;
+        }
+
+        return $ret;
+    }
+
+    /**
      * @todo
      * Vérifie le statut des tâches en cours (status=RUNNING)
      *
      */
-    public function monitorRunningTasks()
+    public function monitorRunningTasks(): void
     {
         // Récupérer le pid des tâches RUNNING
         // Vérifier si le pid tourne toujours ?
@@ -246,7 +282,7 @@ class Taches
      */
     public static function getPid(int $tacheId)
     {
-        $process = Process::fromShellCommandline('pgrep -f \'[b]in/console app:tache:run ' . $tacheId . '\'');
+        $process = Process::fromShellCommandline('pgrep -f \'[b]in/console '.TacheCommand::getDefaultName().' ' . $tacheId . '\'');
         $process->run();
         $output = $process->getOutput();
         if (is_numeric($output)) {
@@ -255,10 +291,10 @@ class Taches
         return false;
     }
 
-    public function setProgress($tache, array $progress)
+    public function setProgress(int $tacheId, array $progress)
     {
-        if (is_integer($tache)) {
-            $tache = $this->tacheRepository->getTacheById($tache);
+        if (is_integer($tacheId)) {
+            $tache = $this->tacheRepository->getTacheById($tacheId);
         }
         if (get_class($tache) != Tache::class) {
             return false;
@@ -275,17 +311,17 @@ class Taches
         if (!$tache) {
             return false;
         }
-        $this->filesystem->remove($this->kernel->getProjectDir() . $this->container->getParameter('app.task_folder') . $tache->getId());
+        $this->filesystem->remove($this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') . $tache->getId());
         $this->em->remove($tache);
         $this->em->flush();
         return true;
     }
 
-    public function setRealStatus($taches)
+    public function setRealStatus(array $taches): array
     {
         foreach ($taches as $tache) {
             if ($tache->getStatus() == Tache::STATUS['RUNNING']) {
-                $pid = Taches::getPid($tache->getId());
+                $pid = self::getPid($tache->getId());
                 $tache->setPid($pid);
                 if ($pid !== false) {
                     $tache->setRealStatus('RUNNING');
