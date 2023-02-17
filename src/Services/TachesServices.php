@@ -3,6 +3,7 @@
 namespace ApidaeTourisme\ApidaeBundle\Services;
 
 use Exception;
+use ReflectionMethod;
 use Psr\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Process\Process;
@@ -218,10 +219,36 @@ class TachesServices
      */
     public function run(Tache $tache): int|bool
     {
+        $this->logger->info(__METHOD__.'('.$tache->getId().')') ;
         $ret = false ;
-        if (preg_match("#^([a-zA-Z]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
+
+        // Méthode non statique : App\Class:method
+        if (preg_match("#^([a-zA-Z\\\]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
+            if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
+                $this->logger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
+                return false ;
+            } else {
+                $rm = new ReflectionMethod($match[1], $match[2]);
+                if ($rm->isStatic()) {
+                    $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode est statique, utilisez :: au lieu de :)') ;
+                    return false ;
+                }
+            }
             $ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
-        } elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
+        }
+        // Méthode statique : App\Class::method
+        elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
+            if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
+                $this->logger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
+                return false ;
+            } else {
+                $rm = new ReflectionMethod($match[1], $match[2]);
+                if (! $rm->isStatic()) {
+                    $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode n\'est pas statique, utilisez : au lieu de ::)') ;
+                    return false ;
+                }
+            }
+
             $ret = call_user_func($match[1].'::'.$match[2], $tache, $this->logger);
         } else {
             $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getMethod().' est incohérence') ;
