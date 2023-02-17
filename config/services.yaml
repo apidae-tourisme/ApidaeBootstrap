@@ -22,7 +22,7 @@ services:
             - "../src_dev/Kernel.php"
             # - "../src_dev/Controller/"
 
-    apidaebootstrap:
+    apidaebundle:
         namespace: ApidaeTourisme\ApidaeBundle\
         resource: "../src/"
         exclude:

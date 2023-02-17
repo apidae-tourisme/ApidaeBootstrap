@@ -73,7 +73,7 @@ class TacheController extends AbstractController
     public function start(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository)
     {
         $tache = $tacheRepository->findOneBy(['id' => $id]);
-        $pid = $tachesServices->start($tache, $request->get('force') == true);
+        $pid = $tachesServices->startByProcess($tache, $request->get('force') == true);
         return new JsonResponse([
             'id' => (int)$tache->getId(),
             'pid' => $pid,

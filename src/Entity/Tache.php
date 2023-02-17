@@ -3,6 +3,7 @@
 namespace ApidaeTourisme\ApidaeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Psr\Log\LoggerInterface;
 
 /**
  * @ORM\Entity(repositoryClass=TacheRepository::class)
@@ -86,7 +87,8 @@ class Tache
     private $pid;
 
     private $realStatus;
-    private $verbose;
+
+    private LoggerInterface $logger ;
 
 
     public function getId(): ?int
@@ -249,17 +251,6 @@ class Tache
         return $this;
     }
 
-    public function getVerbose()
-    {
-        return $this->verbose;
-    }
-
-    public function setVerbose($verbose)
-    {
-        $this->verbose = $verbose;
-        return $this;
-    }
-
     /**
      * @todo peut-être passer plutôt ça sur les services pour récupérer les paramètres ?
      *
@@ -292,7 +283,6 @@ class Tache
             'creationDate' => $this->getCreationdate(),
             'pid' => $this->getPid(),
             'realStatus' => $this->getRealStatus(),
-            'verbose' => $this->getVerbose()
         ];
         return $ret;
     }
@@ -308,5 +298,13 @@ class Tache
             }
         }
         return $return;
+    }
+
+    public function log(string $type, string $message): void
+    {
+        if (! $this->result) {
+            $this->result = [] ;
+        }
+        $this->result[] = [$type, $message] ;
     }
 }

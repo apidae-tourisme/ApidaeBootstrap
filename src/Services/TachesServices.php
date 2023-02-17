@@ -2,6 +2,7 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Services;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Process\Process;
@@ -16,7 +17,6 @@ use ApidaeTourisme\ApidaeBundle\Command\TachesCommand;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -40,8 +40,7 @@ class TachesServices
         protected KernelInterface $kernel,
         protected ParameterBagInterface $params,
         protected Filesystem $filesystem,
-        protected SluggerInterface $slugger,
-        protected EntityManager $entityManager
+        protected SluggerInterface $slugger
     ) {
         $this->dossierTaches = $this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') ;
         $this->logger = $tachesLogger ;
@@ -55,10 +54,8 @@ class TachesServices
     /**
      * Ajoute une tâche TO_RUN en bdd
      */
-    public function add(Tache $tache, ?array $params): int
+    public function add(Tache $tache, ?array $params = null): int
     {
-        $tache = new Tache();
-
         if (!isset($params['userEmail'])) {
             /**
              * @var ApidaeUser $user
@@ -69,7 +66,9 @@ class TachesServices
             $tache->setUserEmail($params['utilisateurEmail']);
         }
 
-        $tache->setTache($params['tache']);
+        if (isset($params['tache'])) {
+            $tache->setTache($params['tache']);
+        }
 
         if (isset($params['parametres'])) {
             $tache->setParametres($params['parametres']);
@@ -135,7 +134,7 @@ class TachesServices
      * Lance une tâche en process (tâche de fond)
      * Une fois lancée, la tâche renseigne le pid du process en base
      */
-    public function start(Tache $tache, bool $force = false)
+    public function startByProcess(Tache $tache, bool $force = false)
     {
         if (!$force && $tache->getStatus() != Tache::STATUS['TO_RUN']) {
             throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
@@ -220,22 +219,9 @@ class TachesServices
     {
         $ret = false ;
         if (preg_match("#^([a-zA-Z]+):([a-zA-Z]+)$#", $tache->getTache(), $match)) {
-            if (!$tache->getVerbose()) {
-                ob_start();
-            }
             $ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
-            if (!$tache->getVerbose()) {
-                ob_end_clean();
-            }
         } elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getTache(), $match)) {
-            if (!$tache->getVerbose()) {
-                ob_start();
-            }
-
             $ret = call_user_func($match[1].'::'.$match[2], $tache, $this->logger);
-            if (!$tache->getVerbose()) {
-                ob_end_clean();
-            }
         } else {
             $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getTache().' est incohérence') ;
         }
@@ -336,7 +322,7 @@ class TachesServices
      */
     public function save(Tache $tache): void
     {
-        $this->entityManager->persist($tache);
-        $this->entityManager->flush();
+        $this->em->persist($tache);
+        $this->em->flush();
     }
 }

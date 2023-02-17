@@ -29,7 +29,7 @@ when@dev:
             taches:
                 type: rotating_file
                 path: "%kernel.logs_dir%/%kernel.environment%.taches.log"
-                level: info
+                level: debug
                 channels: ["taches"]
                 verbosity_levels:
                     VERBOSITY_NORMAL: INFO

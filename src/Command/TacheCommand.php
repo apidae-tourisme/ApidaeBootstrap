@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
+use ApidaeTourisme\ApidaeBundle\Services\TacheService;
 
 /**
  * Lance l'exécution d'une tâche définie par son identifiant
@@ -36,13 +37,11 @@ class TacheCommand extends Command
     protected function configure()
     {
         $this->addArgument('id', InputArgument::REQUIRED, 'Identifiant de tâche obligatoire');
-        $this->addArgument('verbose', InputArgument::OPTIONAL, 'Verbose ? (1|0)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $id = $input->getArgument('id');
-        $verbose = $input->getArgument('verbose');
         $tache = $this->tacheRepository->getTacheById($id) ;
         $logger_context = ['command' => self::getDefaultName(), 'id' => $id] ;
         $this->logger->info(self::getDefaultName().' '.$id, $logger_context) ;
@@ -54,12 +53,10 @@ class TacheCommand extends Command
             // On passe le statut à RUNNING pour que l'interface graphique l'affiche correctement
             $tache->setStatus(Tache::STATUS['RUNNING']);
             $tache->setStartDate(new \DateTime());
-            $tache->setResult(null);
+            $tache->setResult([]);
             $tache->setEndDate(null);
             $tache->setProgress(null);
             $this->tachesServices->save($tache) ;
-
-            $tache->setVerbose($verbose);
 
             $completed = false;
             /**
@@ -70,7 +67,6 @@ class TacheCommand extends Command
             $retour = null;
             try {
                 $this->logger->info('Lancement de la tâche (exec)...', $logger_context) ;
-                $tache->setResult(['logs' => 'Lancement de la tâche (exec)...']);
                 $retour = $this->tachesServices->run($tache);
                 if ($retour === true) {
                     $this->logger->info('exec returned true') ;
@@ -78,9 +74,6 @@ class TacheCommand extends Command
                 } else {
                     $this->logger->warning('exec returned !== true') ;
                     $this->logger->warning(json_encode($retour)) ;
-                    if ($tache->getVerbose()) {
-                        dump($tache->getResult());
-                    }
                 }
             } catch (\Exception $e) {
                 /**
@@ -91,12 +84,7 @@ class TacheCommand extends Command
                 $this->logger->error('Uncatched exception...') ;
                 $this->logger->error($e->getMessage()) ;
                 $retour = 'INTERRUPTED';
-                $result = $tache->getResult();
-                $result[] = ['error', $e->getFile() . ':' . $e->getLine(), $e->getMessage()];
-                $tache->setResult($result);
-                if ($tache->getVerbose()) {
-                    dump($e);
-                }
+                $tache->log('error', $e->getFile() . ':' . $e->getLine(), $e->getMessage()) ;
             }
 
             // on le fait dans tous les cas... on sait jamais, un jour on mettra peut-être des logs d'erreur dans output_file alors s'il est présent, on le stocke !

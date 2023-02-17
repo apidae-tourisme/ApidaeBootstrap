@@ -13,4 +13,9 @@ class ApidaeBundle extends AbstractBundle
         // load an XML, PHP or Yaml file
         $containerConfigurator->import('../resources/services.yaml');
     }
+
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
+    }
 }

@@ -20,7 +20,7 @@ class TacheRepository extends ServiceEntityRepository
         parent::__construct($registry, Tache::class);
     }
 
-    public function getTachesByUtilisateuId(int $id): array
+    public function getTachesByUtilisateuId(int $id): array|null
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.userEmail = :id')
@@ -29,7 +29,7 @@ class TacheRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getTacheById(int $id): Tache
+    public function getTacheById(int $id): Tache|null
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.id = :id')
@@ -38,22 +38,23 @@ class TacheRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function getTacheToRun(): Tache
+    public function getTacheToRun(): Tache|null
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.status = :status')
             ->setParameter('status', Tache::STATUS['TO_RUN'])
             ->orderBy('t.creationdate', 'ASC')
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-    public function getTachesToRun(): array
+    public function getTachesToRun(): array|null
     {
         return $this->getTachesByStatus(Tache::STATUS['TO_RUN']);
     }
 
-    public function getTachesByStatus(string $status): array
+    public function getTachesByStatus(string $status): array|null
     {
         if (!in_array($status, Tache::STATUS)) {
             throw new InvalidParameterException('Status ' . $status . ' invalide pour Tache');
@@ -66,14 +67,9 @@ class TacheRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getTachesRunningNumber()
+    public function getTachesNumberByStatus(string $status): int|null
     {
-        return $this->getTachesNumberByStatus('RUNNING') ;
-    }
-
-    public function getTachesNumberByStatus(string $status)
-    {
-        return $this->createQueryBuilder('i')
+        return $this->createQueryBuilder('t')
             ->select('count(t.id)')
             ->andWhere('t.status = :status')
             ->setParameter('status', $status)
