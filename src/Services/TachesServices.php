@@ -224,8 +224,13 @@ class TachesServices
 
         // Méthode non statique : App\Class:method
         if (preg_match("#^([a-zA-Z\\\]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
-            if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
-                $this->logger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
+            /**
+             * @see https://www.php.net/manual/en/function.is-callable.php#126199
+             * Impossible d'utiliser is_callable ici pour une méthode non statique
+             */
+            //if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
+            if (! method_exists($match[1], $match[2])) {
+                $this->logger->error('Méthode invalide : '.$tache->getMethod()) ;
                 return false ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
