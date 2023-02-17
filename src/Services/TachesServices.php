@@ -239,6 +239,7 @@ class TachesServices
                     return false ;
                 }
             }
+            $this->logger->info(__METHOD__.' : starting : $this->'.lcfirst($match[1]).'->'.$match[2].'(...)') ;
             $ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
         }
         // Méthode statique : App\Class::method
