@@ -26,6 +26,7 @@ class TachesServices
 {
     protected string $dossierTaches;
     protected LoggerInterface $logger ;
+    protected ContainerInterface $container ;
 
     public const FICHIERS_EXTENSIONS = ['xlsx', 'ods'];
     public const FICHIERS_MIMES = [
@@ -45,6 +46,7 @@ class TachesServices
     ) {
         $this->dossierTaches = $this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') ;
         $this->logger = $tachesLogger ;
+        $this->container = $kernel->getContainer() ;
     }
 
     public function getDossierTaches()
@@ -239,8 +241,23 @@ class TachesServices
                     return false ;
                 }
             }
-            $this->logger->info(__METHOD__.' : starting : $this->'.lcfirst($match[1]).'->'.$match[2].'(...)') ;
-            $ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
+            $this->logger->info(__METHOD__.' : starting : '.lcfirst($match[1]).'->'.$match[2].'(...)') ;
+            /**
+             * On s'apprète à lancer une méthode sur un service dont on n'a pas connaissance :
+             * App\Services\Whatever->method(...)
+             * Comme on ne le connait pas il faut l'instancier dynamiquement
+             */
+            /**
+             * @see https://stackoverflow.com/a/65526859
+             */
+
+            // read the parameters given in the cmd and decide what class is
+            // gona be injected.
+            // $service_name = "App\\My\\Namespace\\ServiceClassName"
+            $service = $this->container->get($match[1]);
+            $ret = $service->{$match[2]}($tache, $this->logger);
+
+        //$ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
         }
         // Méthode statique : App\Class::method
         elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {

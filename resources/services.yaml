@@ -7,3 +7,4 @@ services:
     apidaebootstrap:
         namespace: ApidaeTourisme\ApidaeBundle\
         resource: "../src/"
+        public: true
