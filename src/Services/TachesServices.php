@@ -66,8 +66,8 @@ class TachesServices
             $tache->setUserEmail($params['utilisateurEmail']);
         }
 
-        if (isset($params['tache'])) {
-            $tache->setTache($params['tache']);
+        if (isset($params['method'])) {
+            $tache->setMethod($params['method']);
         }
 
         if (isset($params['parametres'])) {

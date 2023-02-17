@@ -29,8 +29,7 @@
         "ext-iconv": "*",
         "doctrine/annotations": "^2.0",
         "hwi/oauth-bundle": "^2.0@beta",
-        "pierre-granger/apidae-membres": "*",
-        "symfony/translation": "6.2.*"
+        "pierre-granger/apidae-membres": "*"
     },
     "config": {
         "allow-plugins": {

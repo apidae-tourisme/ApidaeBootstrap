@@ -58,7 +58,7 @@ class TacheCommand extends Command
             $tache->setProgress(null);
             $this->tachesServices->save($tache) ;
 
-            $completed = false;
+            $commandState = Command::FAILURE;
             /**
              * TachesExecuter::exec($id) lance la tâche (ex: DescriptifsThematisesService::export)
              * récupère le $retour[] de la tâche et le renvoie ici directement
@@ -68,12 +68,17 @@ class TacheCommand extends Command
             try {
                 $this->logger->info('Lancement de la tâche (exec)...', $logger_context) ;
                 $retour = $this->tachesServices->run($tache);
-                if ($retour === true) {
-                    $this->logger->info('exec returned true') ;
-                    $completed = true;
+                if (is_bool($retour)) {
+                    if ($retour) {
+                        $commandState = Command::SUCCESS;
+                    } else {
+                        $this->logger->warning('La tâche ne s\'est pas exécutée correctement') ;
+                    }
+                } elseif (is_int($retour) && in_array($retour, [Command::SUCCESS, Command::FAILURE, Command::INVALID])) {
+                    $commandState = $retour ;
                 } else {
-                    $this->logger->warning('exec returned !== true') ;
-                    $this->logger->warning(json_encode($retour)) ;
+                    $this->logger->warning('La tâche n\'a pas renvoyé un code erreur cohérent :(') ;
+                    $this->logger->warning(var_export($retour)) ;
                 }
             } catch (\Exception $e) {
                 /**
@@ -88,12 +93,19 @@ class TacheCommand extends Command
             }
 
             // on le fait dans tous les cas... on sait jamais, un jour on mettra peut-être des logs d'erreur dans output_file alors s'il est présent, on le stocke !
-            if (isset($retour['output_file'])) {
-                $tache->setFichier($retour['output_file']);
-            }
+            /**
+             * @todo sur la console, $retour pouvait être un array.
+             * Ici pour simplifier, $retour est un Command::SUCCESS/FAILURE/INVALID.
+             * Il faudra voir comment gérer le cas où la tâche renvoie un fichier...
+             * L'action effectuée reçoit la tâche en paramètre (voir TachesServices::run),
+             * le setFichier peut se faire dedans.
+             */
+            // if (isset($retour['output_file'])) {
+            //     $tache->setFichier($retour['output_file']);
+            // }
 
             // Une fois la tâche terminée, on change son status
-            if ($completed == true) {
+            if ($commandState === Command::SUCCESS) {
                 $tache->setStatus(Tache::STATUS['COMPLETED']);
             } else {
                 $tache->setStatus(Tache::STATUS['FAILED']);
@@ -103,10 +115,10 @@ class TacheCommand extends Command
             $this->tachesServices->save($tache);
 
             $this->logger->info('STATUS:' . $tache->getStatus(), $logger_context);
-            return $completed ? Command::SUCCESS : Command::FAILURE;
+            return $commandState;
         } else {
             $this->logger->warning('Tâche '.$id.' introuvable...', $logger_context) ;
-            return self::FAILURE ;
+            return Command::FAILURE ;
         }
     }
 }

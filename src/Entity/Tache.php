@@ -33,7 +33,7 @@ class Tache
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $tache;
+    private $method;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -108,14 +108,14 @@ class Tache
         return $this;
     }
 
-    public function getTache(): ?string
+    public function getMethod(): ?string
     {
-        return $this->tache;
+        return $this->method;
     }
 
-    public function setTache(string $tache): self
+    public function setMethod(string $method): self
     {
-        $this->tache = $tache;
+        $this->method = $method;
 
         return $this;
     }
@@ -270,7 +270,7 @@ class Tache
         $ret = [
             'id' => $this->getId(),
             'userEmail' => $this->getUserEmail(),
-            'tache' => $this->getTache(),
+            'method' => $this->getMethod(),
             'fichier' => $this->getFichier(),
             'parametres' => $this->getParametres(),
             'parametresCaches' => $this->getParametresCaches(),
