@@ -89,14 +89,6 @@ class TachesServices
 
         $id = $tache->getId();
 
-        $tachePath = $this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') . $id . '/';
-        try {
-            $this->filesystem->remove($tachePath);
-            $this->filesystem->mkdir($tachePath, 0777);
-        } catch (IOException $e) {
-            $this->logger->error(__METHOD__ . ':' . $e->getMessage());
-            return false;
-        }
         /**
          * Traitement du fichier :
          * 2 cas : le fichier est déjà créé et déjà mis à sa place.
@@ -106,11 +98,20 @@ class TachesServices
             && gettype($params['fichier']) == 'object'
             && get_class($params['fichier']) == 'Symfony\Component\HttpFoundation\File\UploadedFile'
         ) {
-            if (!in_array($params['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
-                $this->logger->error(__METHOD__ . ': Type de fichier non autorisé');
+            $tachePath = $this->kernel->getProjectDir() .'/'. $this->params->get('apidaebundle.task_folder') . $id . '/';
+            try {
+                $this->filesystem->remove($tachePath);
+                $this->filesystem->mkdir($tachePath, 0777);
+            } catch (IOException $e) {
+                $this->logger->error(__METHOD__ . ':' . $e->getMessage());
                 return false;
             }
-            $originalFilename = pathinfo($params['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
+
+                        if (!in_array($params['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
+                            $this->logger->error(__METHOD__ . ': Type de fichier non autorisé');
+                            return false;
+                        }
+                        $originalFilename = pathinfo($params['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
             $filename = $this->slugger->slug($originalFilename) .  '.' . $params['fichier']->guessExtension();
 
             try {
