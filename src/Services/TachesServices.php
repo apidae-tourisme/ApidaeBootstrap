@@ -148,7 +148,7 @@ class TachesServices
 
         /**
          * @see https://symfony.com/doc/current/components/process.html
-         * $process = new Process([$path, $tache->getTache()]);
+         * $process = new Process([$path, $tache->getMethod()]);
          * $process = new Process($cl);
          * $process->start();
         */
@@ -218,16 +218,16 @@ class TachesServices
     public function run(Tache $tache): int|bool
     {
         $ret = false ;
-        if (preg_match("#^([a-zA-Z]+):([a-zA-Z]+)$#", $tache->getTache(), $match)) {
+        if (preg_match("#^([a-zA-Z]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
             $ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
-        } elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getTache(), $match)) {
+        } elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
             $ret = call_user_func($match[1].'::'.$match[2], $tache, $this->logger);
         } else {
-            $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getTache().' est incohérence') ;
+            $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getMethod().' est incohérence') ;
         }
 
         if (! is_int($ret) && ! is_bool($ret)) {
-            $this->logger->error('La valeur retour de '.$tache->getTache().' n\'est pas un integer ou un booléen :(') ;
+            $this->logger->error('La valeur retour de '.$tache->getMethod().' n\'est pas un integer ou un booléen :(') ;
         }
 
         return $ret;

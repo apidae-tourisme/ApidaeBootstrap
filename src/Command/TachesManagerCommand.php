@@ -79,7 +79,7 @@ class TachesManagerCommand extends Command
                 if ($next) {
                     $this->logger->info('Une tâche en attente va être exécutée : tachesServices->startByProcess($tache)', [
                         'id' => $next->getId(),
-                        'tache' => $next->getTache()
+                        'tache' => $next->getMethod()
                     ]) ;
                     $this->tachesServices->startByProcess($next) ;
                 //return $this->tachesServices->execute($next->getId(), $verbose, ['command' => self::getDefaultName(), 'id' => $id]) ;

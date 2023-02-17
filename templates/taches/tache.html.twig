@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% set titre = tache.id ~ ' ' ~tache.tache %}
+{% set titre = tache.id ~ ' ' ~tache.method %}
 
 {% block main %}
 {# {% if ( tache.userEmail == app.user.id ) %} <a class="tache delete" href="{{ path('apidaebundle_taches_delete',{'id':tache.id}) }}"><i class="fas fa-trash"></i></a>{% endif %} #}
