@@ -2,16 +2,20 @@
 Le plus souvent à partir d'un controler (après clic sur un bouton, envoi d'un formulaire...) :
 
 ```php
-use App\Service\Taches ; // $taches (service)
-$tache = [
-    'tache' => 'DescriptifsThematisesService:import',
-    'parametres' => $parametres,
-    'fichier' => $data['fichier'],
-    'parametresCaches' => ['tokenSSO' => $user->getApidaeToken()]
-];
-$id = $taches->add($tache);
-//$taches->start($id);
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices ; // $tachesServices (service)
+
+$tache = new Tache();
+$tache->setMethod('App\\Services\\TIFService:extractAll');
+$tache->setParametres(['source' => $source]);
+$tachesServices->add($tache) ;
 ```
+
+# Lancer le gestionnaire de tâche
+```bash
+bin/console apidae:tachesManager:start
+```
+
+# TODO : refaire la partie ci-dessous
 
 - `string` **tache** : Nom de la classe et de la fonction qui seront lancées sous cette forme :
     - `$this->{lcfirst("DescriptifsThematises")}->{"import"}($tache->getId())`
