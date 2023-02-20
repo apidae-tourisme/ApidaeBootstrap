@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/apidae-tourisme/ApidaeBootstrap.git"
+    "url": "git+https://github.com/apidae-tourisme/ApidaeBundle.git"
   },
   "bugs": {
-    "url": "https://github.com/apidae-tourisme/ApidaeBootstrap/issues"
+    "url": "https://github.com/apidae-tourisme/ApidaeBundle/issues"
   },
-  "homepage": "https://github.com/apidae-tourisme/ApidaeBootstrap/#readme",
+  "homepage": "https://github.com/apidae-tourisme/ApidaeBundle/#readme",
   "scripts": {
     "dev-server": "encore dev-server",
     "dev": "encore dev",
