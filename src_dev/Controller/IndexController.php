@@ -3,7 +3,6 @@
     namespace App\Controller ;
 
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-    use Symfony\Component\Routing\RouterInterface;
     use Symfony\Component\Routing\Annotation\Route;
 
     class IndexController extends AbstractController
@@ -11,7 +10,7 @@
         #[Route('/', name: 'app_index')]
         public function index()
         {
-            return $this->render('base.html.twig');
+            return $this->render('demo/index.html.twig');
         }
 
         #[Route('/login', name: 'app_login')]

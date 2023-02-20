@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/apidae-tourisme/ApidaeBootstrap.git"
+    "url": "git+https://github.com/apidae-tourisme/ApidaeBundle.git"
   },
   "bugs": {
-    "url": "https://github.com/apidae-tourisme/ApidaeBootstrap/issues"
+    "url": "https://github.com/apidae-tourisme/ApidaeBundle/issues"
   },
-  "homepage": "https://github.com/apidae-tourisme/ApidaeBootstrap/#readme",
+  "homepage": "https://github.com/apidae-tourisme/ApidaeBundle/#readme",
   "scripts": {
     "dev-server": "encore dev-server",
     "dev": "encore dev",
@@ -34,7 +34,11 @@
     "@symfony/webpack-encore": "github:symfony/webpack-encore",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.5.0",
+    "chosen-js": "^1.8.7",
     "core-js": "^3.27.2",
+    "datatables": "^1.10.18",
+    "dateformat": "^5.0.3",
+    "dotenv": "^16.0.3",
     "jquery": "^3.6.0"
   },
   "devDependencies": {

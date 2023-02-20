@@ -33,8 +33,11 @@
         </script>
         {% endif %}
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
+        {% if apidaebundle_taches_path is defined %}<script>
+            var apidaebundle_taches_path = "{{ apidaebundle_taches_path }}" ;
+        </script>{% endif %}
     </head>
-    <body class="{{ app_env }}">
+    <body class="{{ app_env }}{% if body_class is defined %} {{ body_class }}{% endif %}">
         {% block body %}
             {% block header %}{% include 'header.html.twig' %}{% endblock %}
             {% block container %}
@@ -57,8 +60,6 @@
                         {% block breadcrumb %}
                             {% if breadcrumb is defined %}
                                 {% include 'breadcrumb.html.twig' %}
-                            {% else %}
-                                {% include 'demo/breadcrumb.html.twig' %}
                             {% endif %}
                         {% endblock %}
                         {% block h1 %}

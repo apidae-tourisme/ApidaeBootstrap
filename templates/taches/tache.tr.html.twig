@@ -1,0 +1,39 @@
+<tr data-tacheid={{ tache.id }}>
+    <td>{% if ( tache.userEmail == app.user.email ) %} <a class="tache delete" href="{{ path('apidaebundle_taches_delete',{'id':tache.id}) }}"><i class="fas fa-trash"></i></a>{% endif %}</td>
+    <td data-sort="{{ tache.creationdate|date('YmdHis') }}">
+        <div class="d-flex"><i class="fas fa-plus-circle" title="Créée"></i> &nbsp; <small class="creationdate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.creationdate, balise : 'span' } %}</small></div>
+        <div class="d-flex"><i class="fas fa-play" title="Commencée"></i> &nbsp; <small class="startdate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.startdate, balise : 'span' } %}</small></div>
+        <div class="d-flex"><i class="fas fa-stop" title="Terminée"></i> &nbsp; <small class="enddate">{% include 'utils/date.html.twig' with { hour : true, second : true, date : tache.enddate, balise : 'span' } %}</small></div>
+    </td>
+    {% if showId is not defined or showId == true %}
+        <th><code>{{ tache.id }}</code></th>
+    {% endif %}
+    {% if showuserEmail is not defined or showuserEmail == true %}
+        <td>{{ tache.userEmail }}</td>
+    {% endif %}
+    {% if showMethod is not defined or showMethod == true %}
+        <td><code>{{ tache.method }}</code></td>
+    {% endif %}
+    {% if showFichier is not defined or showFichier == true %}
+        <td class="fichier">
+            {% if tache.fichier is not null %}
+                <small><a href="{{ path('apidaebundle_taches_download', {'id' : tache.id }) }}">{{ tache.fichier }}</a></small>
+            {% endif %}
+        </td>
+    {% endif %}
+    <td class="status" data-tacheid="{{ tache.id }}">
+        {% include 'taches/status.html.twig' %}
+    </td>
+    {% if showParametres is not defined or showParametres == true %}
+        <td class="parametres">
+            <i class="fas showParametres fa-tools" style="cursor:pointer;"></i>
+            <div class="showParametres" style="display:none;">
+                <code class="json">{{ tache.parametres|json_encode(constant('JSON_PRETTY_PRINT')) }}</code>
+            </div>
+        </td>
+    {% endif %}
+    <td class="result">
+        {% include 'taches/result.html.twig' %}
+    </td>
+    <td><a href="{{ path('apidaebundle_taches_tache',{id:tache.id}) }}"><i class="fas fa-eye"></i></a></td>
+</tr>

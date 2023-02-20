@@ -1,0 +1,24 @@
+a.logo-apidae {
+    background-image: url("../images/logo.svg");
+    background-position: center left;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    height: 100%;
+    position: relative;
+    padding: .7em 0;
+
+    >span {
+        font-size: 0;
+        display: none;
+    }
+
+    >strong {
+        display: block;
+        text-align: right;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        font-size: .9em;
+    }
+}

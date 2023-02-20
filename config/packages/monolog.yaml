@@ -1,6 +1,7 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - taches
 
 when@dev:
     monolog:
@@ -22,6 +23,16 @@ when@dev:
                 type: console
                 process_psr_3_messages: false
                 channels: ["!event", "!doctrine", "!console"]
+                level: info
+                verbosity_levels:
+                    VERBOSITY_NORMAL: INFO
+            taches:
+                type: rotating_file
+                path: "%kernel.logs_dir%/%kernel.environment%.taches.log"
+                level: debug
+                channels: ["taches"]
+                verbosity_levels:
+                    VERBOSITY_NORMAL: INFO
 
 when@test:
     monolog:

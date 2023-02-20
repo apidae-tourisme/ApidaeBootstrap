@@ -1,32 +1,32 @@
 .ellipsis {
-    height:1.3em;
-    overflow:hidden;
-    cursor:pointer;
+    height: 1.3em;
+    overflow: hidden;
+    cursor: pointer;
 
     &.show {
-        height:auto;
-        overflow:visible;
+        height: auto;
+        overflow: visible;
     }
 }
 
-.badge-info {
-    background-color:#bfce81;
-    color:white;
+.bg-info {
+    background-color: #bfce81;
+    color: white;
 }
 
-.badge-connect {
-    background-color:#df7b7b;
-    color:white;
+.bg-connect {
+    background-color: #df7b7b;
+    color: white;
 }
 
-.badge-leader {
-    background-color:#edc141;
-    color:white;
+.bg-leader {
+    background-color: #edc141;
+    color: white;
 }
 
-.badge-expired {
-    border:2px solid rgb(189, 15, 15);
-    text-decoration:line-through;
+.bg-expired {
+    border: 2px solid rgb(189, 15, 15);
+    text-decoration: line-through;
     text-decoration-color: black;
     text-decoration-thickness: 2px;
 }

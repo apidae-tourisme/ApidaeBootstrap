@@ -1,0 +1,7 @@
+<a href="/" class="logo-apidae">
+    <img src="{{ asset('build/images/logo.svg') }}" height="100%" />
+    <span>Apidae</span>
+    {% if app_title is defined %}
+        <strong>{{ app_title }}{% if app_env != 'prod' %}.{{ app_env }}{% endif %}</strong>
+    {% endif %}
+</a>

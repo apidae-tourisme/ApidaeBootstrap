@@ -1,0 +1,21 @@
+    <table class="table dataTable taches" data-order="[[1,&quot;desc&quot;]]">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Dates</th>
+                {% if showId is not defined or showId == true %}<th>id</th>{% endif %}
+                {% if showuserEmail is not defined or showuserEmail == true %}<th>userEmail</th>{% endif %}
+                {% if showMethod is not defined or showMethod == true %}<th>Method</th>{% endif %}
+                {% if showFichier is not defined or showFichier == true %}<th>fichier</th>{% endif %}
+                <th>status</th>
+                {% if showParametres is not defined or showParametres == true %}<th>parametres</th>{% endif %}
+                <th>result</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tache in taches %}
+                {% include 'taches/tache.tr.html.twig' %}
+            {% endfor %}
+        </tbody>
+    </table>
