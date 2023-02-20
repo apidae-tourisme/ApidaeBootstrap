@@ -16,6 +16,7 @@ bin/console apidae:tachesManager:start
 ```
 
 # Lancer une tâche seule (ex: id 18)
+C'est exactement ce que ferait le gestionnaire de tâche à partir des tâches TO_RUN : il relance une commande
 ```bash
 bin/console apidae:tache:run 18
 ```
