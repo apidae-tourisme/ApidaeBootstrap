@@ -15,6 +15,11 @@ $tachesServices->add($tache) ;
 bin/console apidae:tachesManager:start
 ```
 
+# Lancer une tâche seule (ex: id 18)
+```bash
+bin/console apidae:tache:run 18
+```
+
 # TODO : refaire la partie ci-dessous
 
 - `string` **tache** : Nom de la classe et de la fonction qui seront lancées sous cette forme :
