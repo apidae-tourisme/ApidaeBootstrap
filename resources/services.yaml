@@ -8,3 +8,5 @@ services:
         namespace: ApidaeTourisme\ApidaeBundle\
         resource: "../src/"
         public: true
+        exclude:
+            - "../src/ApidaeResourceOwner.php"
