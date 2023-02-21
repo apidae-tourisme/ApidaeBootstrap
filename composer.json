@@ -3,7 +3,7 @@
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "name": "apidae-tourisme/apidae-bootstrap",
+    "name": "apidae-tourisme/apidae-bundle",
     "authors": [
         {
             "name": "Pierre Granger",
