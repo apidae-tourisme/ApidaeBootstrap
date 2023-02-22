@@ -22,9 +22,6 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        dump($error) ;
-        dump($lastUsername) ;
-
         //return $this->redirectToRoute('connect_start', ['service' => 'apidae']) ;
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
