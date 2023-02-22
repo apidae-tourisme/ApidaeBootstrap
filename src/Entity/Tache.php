@@ -149,14 +149,14 @@ class Tache
         return $this;
     }
 
-    public function getStatus(): ?TachesStatus
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
     public function setStatus(?TachesStatus $status): self
     {
-        $this->status = $status;
+        $this->status = $status->value;
 
         return $this;
     }
