@@ -7,13 +7,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Symfony\Component\Console\Command\Command;
-use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use Symfony\Component\Console\Output\OutputInterface;
-use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 use ApidaeTourisme\ApidaeBundle\Services\TacheService;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
+use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 
 /**
  * Lance l'exécution d'une tâche définie par son identifiant
@@ -51,7 +52,7 @@ class TacheCommand extends Command
             $this->logger->info('execute...', $logger_context);
 
             // On passe le statut à RUNNING pour que l'interface graphique l'affiche correctement
-            $tache->setStatus(Tache::STATUS['RUNNING']);
+            $tache->setStatus(TachesStatus::RUNNING);
             $tache->setStartDate(new \DateTime());
             $tache->setResult([]);
             $tache->setEndDate(null);
@@ -106,9 +107,9 @@ class TacheCommand extends Command
 
             // Une fois la tâche terminée, on change son status
             if ($commandState === Command::SUCCESS) {
-                $tache->setStatus(Tache::STATUS['COMPLETED']);
+                $tache->setStatus(TachesStatus::COMPLETED);
             } else {
-                $tache->setStatus(Tache::STATUS['FAILED']);
+                $tache->setStatus(TachesStatus::FAILED);
             }
 
             $tache->setEndDate(new \DateTime());

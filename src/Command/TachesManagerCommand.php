@@ -82,7 +82,6 @@ class TachesManagerCommand extends Command
                         'tache' => $next->getMethod()
                     ]) ;
                     $this->tachesServices->startByProcess($next) ;
-                //return $this->tachesServices->execute($next->getId(), $verbose, ['command' => self::getDefaultName(), 'id' => $id]) ;
                 } else {
                     $this->logger->debug('Aucune tâche en attente n\'a été trouvée') ;
                 }

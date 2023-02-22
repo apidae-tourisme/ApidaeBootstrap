@@ -2,6 +2,7 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Entity;
 
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use Doctrine\ORM\Mapping as ORM;
 use Psr\Log\LoggerInterface;
 
@@ -10,14 +11,6 @@ use Psr\Log\LoggerInterface;
  */
 class Tache
 {
-    public const STATUS = [
-        'TO_RUN' => 'TO_RUN',
-        'RUNNING' => 'RUNNING',
-        'COMPLETED' => 'COMPLETED',
-        'FAILED' => 'FAILED',
-        'INTERRUPTED' => 'INTERRUPTED',
-        'CANCELLED' => 'CANCELLED'
-    ];
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -156,12 +149,12 @@ class Tache
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?TachesStatus
     {
         return $this->status;
     }
 
-    public function setStatus(?string $status): self
+    public function setStatus(?TachesStatus $status): self
     {
         $this->status = $status;
 

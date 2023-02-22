@@ -15,6 +15,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\KernelInterface;
 use ApidaeTourisme\ApidaeBundle\Command\TacheCommand;
 use ApidaeTourisme\ApidaeBundle\Command\TachesCommand;
+use ApidaeTourisme\ApidaeBundle\Config\TachesCodes;
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
@@ -86,7 +88,7 @@ class TachesServices
 
         $tache->setCreationdate(new \DateTime());
 
-        $tache->setStatus(Tache::STATUS['TO_RUN']);
+        $tache->setStatus(TachesStatus::TO_RUN);
 
         $this->save($tache);
 
@@ -140,7 +142,7 @@ class TachesServices
      */
     public function startByProcess(Tache $tache, bool $force = false)
     {
-        if (!$force && $tache->getStatus() != Tache::STATUS['TO_RUN']) {
+        if (!$force && $tache->getStatus() != TachesStatus::TO_RUN) {
             throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
         }
 
@@ -188,7 +190,7 @@ class TachesServices
         $response = [];
 
         $killable_status = [
-            Tache::STATUS['RUNNING']
+            TachesStatus::RUNNING
         ];
 
         $realPid = $this->getPid($tache->getId());
@@ -219,10 +221,14 @@ class TachesServices
     /**
      * Exécute la tâche
      */
-    public function run(Tache $tache): int|bool
+    public function run(Tache $tache): TachesCodes
     {
         $this->logger->info(__METHOD__.'('.$tache->getId().')') ;
-        $ret = false ;
+
+        /**
+         * @var int $ret
+         */
+        $ret = TachesCodes::FAILURE ;
 
         // Méthode non statique : App\Class:method
         if (preg_match("#^([a-zA-Z\\\]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
@@ -233,12 +239,12 @@ class TachesServices
             //if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
             if (! method_exists($match[1], $match[2])) {
                 $this->logger->error('Méthode invalide : '.$tache->getMethod()) ;
-                return false ;
+                return TachesCodes::FAILURE ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
                 if ($rm->isStatic()) {
                     $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode est statique, utilisez :: au lieu de :)') ;
-                    return false ;
+                    return TachesCodes::FAILURE ;
                 }
             }
             $this->logger->info(__METHOD__.' : starting : '.lcfirst($match[1]).'->'.$match[2].'(...)') ;
@@ -255,24 +261,22 @@ class TachesServices
             // gona be injected.
             // $service_name = "App\\My\\Namespace\\ServiceClassName"
             $service = $this->container->get($match[1]);
-            $ret = $service->{$match[2]}($tache, $this->logger);
-
-        //$ret = $this->{lcfirst($match[1])}->{$match[2]}($tache, $this->logger);
+            $ret = $service->{$match[2]}($tache);
         }
         // Méthode statique : App\Class::method
         elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
             if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
                 $this->logger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
-                return false ;
+                return TachesCodes::FAILURE ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
                 if (! $rm->isStatic()) {
                     $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode n\'est pas statique, utilisez : au lieu de ::)') ;
-                    return false ;
+                    return TachesCodes::FAILURE ;
                 }
             }
 
-            $ret = call_user_func($match[1].'::'.$match[2], $tache, $this->logger);
+            $ret = call_user_func($match[1].'::'.$match[2], $tache);
         } else {
             $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getMethod().' est incohérence') ;
         }
@@ -294,11 +298,11 @@ class TachesServices
         // Récupérer le pid des tâches RUNNING
         // Vérifier si le pid tourne toujours ?
         // Si non : mettre la tâche à INTERRUPTED : la tâche aurait dû passer à COMPLETED
-        $taches = $this->tacheRepository->getTachesByStatus(Tache::STATUS['RUNNING']);
+        $taches = $this->tacheRepository->getTachesByStatus(TachesStatus::RUNNING);
         foreach ($taches as $tache) {
             $tacheId = $tache->getId();
             if (!$this->running($tacheId)) {
-                $tache->setStatus(Tache::STATUS['INTERRUPTED']);
+                $tache->setStatus(TachesStatus::INTERRUPTED);
                 $this->save($tache);
             }
         }
@@ -353,13 +357,13 @@ class TachesServices
     public function setRealStatus(array $taches): array
     {
         foreach ($taches as $tache) {
-            if ($tache->getStatus() == Tache::STATUS['RUNNING']) {
+            if ($tache->getStatus() == TachesStatus::RUNNING) {
                 $pid = self::getPid($tache->getId());
                 $tache->setPid($pid);
                 if ($pid !== false) {
-                    $tache->setRealStatus('RUNNING');
+                    $tache->setRealStatus(TachesStatus::RUNNING);
                 } else {
-                    $tache->setRealStatus('NOT_RUNNING');
+                    $tache->setRealStatus(TachesStatus::INTERRUPTED);
                 }
             }
         }

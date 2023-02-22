@@ -2,6 +2,7 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Repository;
 
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -42,7 +43,7 @@ class TacheRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.status = :status')
-            ->setParameter('status', Tache::STATUS['TO_RUN'])
+            ->setParameter('status', TachesStatus::TO_RUN)
             ->orderBy('t.creationdate', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
@@ -51,14 +52,11 @@ class TacheRepository extends ServiceEntityRepository
 
     public function getTachesToRun(): array|null
     {
-        return $this->getTachesByStatus(Tache::STATUS['TO_RUN']);
+        return $this->getTachesByStatus(TachesStatus::TO_RUN);
     }
 
-    public function getTachesByStatus(string $status): array|null
+    public function getTachesByStatus(TachesStatus $status): array|null
     {
-        if (!in_array($status, Tache::STATUS)) {
-            throw new InvalidParameterException('Status ' . $status . ' invalide pour Tache');
-        }
         return $this->createQueryBuilder('t')
             ->andWhere('t.status = :status')
             ->setParameter('status', $status)
