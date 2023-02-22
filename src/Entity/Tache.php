@@ -156,7 +156,7 @@ class Tache
 
     public function setStatus(?TachesStatus $status): self
     {
-        $this->status = $status->value;
+        $this->status = (string)$status->value;
 
         return $this;
     }
