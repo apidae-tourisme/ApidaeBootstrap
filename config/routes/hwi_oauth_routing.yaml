@@ -1,7 +1,7 @@
 hwi_oauth_redirect:
     resource: "@HWIOAuthBundle/Resources/config/routing/redirect.php"
-    prefix: /connect
+    prefix: /apidaebundle/connect
 
 hwi_oauth_connect:
     resource: "@HWIOAuthBundle/Resources/config/routing/connect.php"
-    prefix: /connect
+    prefix: /apidaebundle/connect

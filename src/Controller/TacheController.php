@@ -22,18 +22,6 @@ class TacheController extends AbstractController
     {
     }
 
-    #[Route('/', name: 'index')]
-    public function index()
-    {
-        return $this->render('base.html.twig');
-    }
-
-    #[Route('/login', name: 'login')]
-    public function login()
-    {
-        return $this->render('login.html.twig');
-    }
-
     #[Route('/mestaches', name: 'mestaches')]
     public function mestaches(TacheRepository $tacheRepository, KernelInterface $kernel, TachesServices $tachesServices)
     {

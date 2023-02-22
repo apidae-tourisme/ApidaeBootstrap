@@ -17,16 +17,16 @@ security:
 
             oauth:
                 resource_owners:
-                    apidae: "/login/check-apidae"
-                login_path: /login
+                    apidae: "/apidaebundle/login/check-apidae"
+                login_path: /apidaebundle/login
                 use_forward: false
-                failure_path: /login
+                failure_path: /apidaebundle/login
 
                 oauth_user_provider:
                     service: ApidaeTourisme\ApidaeBundle\ApidaeUserProvider
 
             logout:
-                path: /logout
+                path: /apidaebundle/logout
                 target: /
                 invalidate_session: true
 
@@ -39,5 +39,5 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/(login|logout|connect), roles: PUBLIC_ACCESS }
+        - { path: ^/apidaebundle/(login|logout|connect), roles: PUBLIC_ACCESS }
         - { path: ^/, roles: [IS_AUTHENTICATED_FULLY] }

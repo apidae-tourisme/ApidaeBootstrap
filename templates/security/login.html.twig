@@ -7,6 +7,14 @@
 
         <div style="height:80px;margin-bottom:40px;">{% include 'logo.html.twig' %}</div>
 
+        {% if error is defined and error != '' %}
+            {% if error.message is defined %}
+                <div class="alert alert-danger">{{ error.message }}</div>
+            {% else %}
+                <div class="alert alert-danger"><pre>{{ error }}</pre></div>
+            {% endif %}
+        {% endif %}
+
         <a class="btn btn-primary btn-block align-middle" href="{{ path('hwi_oauth_service_redirect', {service:'apidae'}) }}">
             <span>Identification avec Apidae</span>
         </a>

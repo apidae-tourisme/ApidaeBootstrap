@@ -13,11 +13,11 @@
             return $this->render('demo/index.html.twig');
         }
 
-        #[Route('/login', name: 'app_login')]
-        public function login()
-        {
-            return $this->render('login.html.twig');
-        }
+        // #[Route('/login', name: 'app_login')]
+        // public function login()
+        // {
+        //     return $this->render('login.html.twig');
+        // }
 
         #[Route('/logout', name: 'app_logout')]
         public function logout()

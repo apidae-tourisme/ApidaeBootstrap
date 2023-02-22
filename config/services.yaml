@@ -18,7 +18,7 @@ services:
         namespace: App\
         resource: "../src_dev/"
         exclude:
-            - "../src_dev/Entity/"
+            #- "../src_dev/Entity/"
             - "../src_dev/Kernel.php"
             # - "../src_dev/Controller/"
 

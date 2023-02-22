@@ -11,11 +11,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
+#[Route('/apidaebundle', name: 'apidaebundle_')]
 class SecurityController extends AbstractController
 {
-    /**
-     * @Route("/login", name="app_login")
-     */
+    #[Route('/login', name: 'login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         // get the login error if there is one
@@ -23,13 +22,14 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        dump($error) ;
+        dump($lastUsername) ;
+
         //return $this->redirectToRoute('connect_start', ['service' => 'apidae']) ;
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
-    /**
-     * @Route("/logout", name="app_logout")
-     */
+    #[Route('/logout', name: 'logout')]
     public function logout()
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
@@ -37,27 +37,25 @@ class SecurityController extends AbstractController
 
     /**
      * Link to this controller to start the "connect" process
-     *
-     * @Route("/connect/start", name="connect_start")
      */
-    public function connectStart(Request $request, ClientRegistry $clientRegistry): RedirectResponse
-    {
-        return match ($request->query->get('service')) {
-            'apidae' => $clientRegistry
-                        ->getClient($request->query->get('service'))
-                        ->redirect(['sso'], []),
-            'auth0' => $clientRegistry
-                        ->getClient($request->query->get('service'))
-                        ->redirect(['openid email'], []),
-            default => new RedirectResponse('index')
-        } ;
-    }
+    // #[Route('/connect/start', name: 'connect_start')]
+    // public function connectStart(Request $request, ClientRegistry $clientRegistry): RedirectResponse
+    // {
+    //     return match ($request->query->get('service')) {
+    //         'apidae' => $clientRegistry
+    //                     ->getClient($request->query->get('service'))
+    //                     ->redirect(['sso'], []),
+    //         'auth0' => $clientRegistry
+    //                     ->getClient($request->query->get('service'))
+    //                     ->redirect(['openid email'], []),
+    //         default => new RedirectResponse('index')
+    //     } ;
+    // }
 
     /**
      * Apidae redirects to back here afterwards
-     *
-     * @Route("/connect/check", name="connect_check")
      */
+    #[Route('/connect/check', name: 'connect_check')]
     public function connectCheck(Session $session)
     {
         $target = $session->get('_security.main.target_path');

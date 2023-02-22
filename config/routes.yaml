@@ -11,4 +11,4 @@ controllers:
     type: attribute
 
 apidae_login:
-    path: /login/check-apidae
+    path: /apidaebundle/login/check-apidae
