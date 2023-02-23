@@ -281,10 +281,6 @@ class TachesServices
             $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getMethod().' est incohérence') ;
         }
 
-        if (! is_int($ret) && ! is_bool($ret)) {
-            $this->logger->error('La valeur retour de '.$tache->getMethod().' n\'est pas un integer ou un booléen :(') ;
-        }
-
         return $ret;
     }
 
