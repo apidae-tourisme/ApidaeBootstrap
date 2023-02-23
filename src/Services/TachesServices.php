@@ -142,7 +142,7 @@ class TachesServices
      */
     public function startByProcess(Tache $tache, bool $force = false)
     {
-        if (!$force && $tache->getStatus() != TachesStatus::TO_RUN) {
+        if (!$force && $tache->getStatus() != TachesStatus::TO_RUN->value) {
             throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
         }
 
