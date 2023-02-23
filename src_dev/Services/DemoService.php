@@ -4,7 +4,7 @@ namespace App\Services ;
 
 use Psr\Log\LoggerInterface;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
-use ApidaeTourisme\ApidaeBundle\Config\TachesCodes;
+use ApidaeTourisme\ApidaeBundle\Config\TachesCode;
 
 class DemoService
 {
@@ -15,9 +15,9 @@ class DemoService
      * Exemple type de tâche lancée par le gestionnaire de tâche :
      * apidae:tache:run X
      */
-    public static function demo(Tache $tache): TachesCodes
+    public static function demo(Tache $tache): TachesCode
     {
-        $steps = 5 ;
+        $steps = 2 ;
         $logger_context = ['id' => $tache->getId(), 'steps' => $steps] ;
         $step = 1 ;
         do {
@@ -29,20 +29,30 @@ class DemoService
              */
             //$this->logger->info('Début de l\'étape...', $logger_context) ;
             // Do whatever this task has to do
-            sleep(2) ;
+            sleep(1) ;
             $step++ ;
             $tache->log('info', 'Fin de l\'étape '.$step.'...');
             //$this->logger->info('Etape terminée !', $logger_context) ;
         } while ($step <= $steps) ;
 
-        return TachesCodes::SUCCESS ;
+        return TachesCode::SUCCESS ;
     }
 
     /**
      * @todo Montrer un exemple de tâche utilisant une méthode non statique
     */
-    public function demo2(Tache $tache): TachesCodes
+    public function demo2(Tache $tache): TachesCode
     {
-        return TachesCodes::SUCCESS ;
+        $laTacheSeDerouleBien = false ;
+        $ilYAUnTrucBizarre = true ;
+
+        if ($ilYAUnTrucBizarre) {
+            return TachesCode::INVALID ;
+        }
+
+        if ($laTacheSeDerouleBien) {
+            return TachesCode::SUCCESS ;
+        }
+        return TachesCode::FAILURE ;
     }
 }

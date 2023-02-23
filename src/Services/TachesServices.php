@@ -15,7 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\KernelInterface;
 use ApidaeTourisme\ApidaeBundle\Command\TacheCommand;
 use ApidaeTourisme\ApidaeBundle\Command\TachesCommand;
-use ApidaeTourisme\ApidaeBundle\Config\TachesCodes;
+use ApidaeTourisme\ApidaeBundle\Config\TachesCode;
 use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -221,14 +221,14 @@ class TachesServices
     /**
      * Exécute la tâche
      */
-    public function run(Tache $tache): TachesCodes
+    public function run(Tache $tache): TachesCode
     {
         $this->logger->info(__METHOD__.'('.$tache->getId().')') ;
 
         /**
          * @var int $ret
          */
-        $ret = TachesCodes::FAILURE ;
+        $ret = TachesCode::FAILURE ;
 
         // Méthode non statique : App\Class:method
         if (preg_match("#^([a-zA-Z\\\]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
@@ -239,12 +239,12 @@ class TachesServices
             //if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
             if (! method_exists($match[1], $match[2])) {
                 $this->logger->error('Méthode invalide : '.$tache->getMethod()) ;
-                return TachesCodes::FAILURE ;
+                return TachesCode::FAILURE ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
                 if ($rm->isStatic()) {
                     $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode est statique, utilisez :: au lieu de :)') ;
-                    return TachesCodes::FAILURE ;
+                    return TachesCode::FAILURE ;
                 }
             }
             $this->logger->info(__METHOD__.' : starting : '.lcfirst($match[1]).'->'.$match[2].'(...)') ;
@@ -267,12 +267,12 @@ class TachesServices
         elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
             if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
                 $this->logger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
-                return TachesCodes::FAILURE ;
+                return TachesCode::FAILURE ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
                 if (! $rm->isStatic()) {
                     $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode n\'est pas statique, utilisez : au lieu de ::)') ;
-                    return TachesCodes::FAILURE ;
+                    return TachesCode::FAILURE ;
                 }
             }
 
