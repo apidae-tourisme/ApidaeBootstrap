@@ -1,44 +1,63 @@
-    {% set difference_obj = date("now").diff(date(date)) %}
-    {% set difference = difference_obj.days %}
+{% if date is not null %}
 
-    {% if date is not null %}
-    
-    {% if datetype is defined and datetype == 'expiration' %}
+	{# {"date":"2023-02-24 09:57:18.291345","timezone_type":3,"timezone":"UTC"} #}
+	{# Cas de l'utilisation d'un DateTime poussé dans du json en bdd : offre.logsExtract apidae-import par exemple #}
+	{# @todo : Traiter la timezone pour afficher 10:57 au lieu de 09:57 qui est l'heure UTC #}
+    {# @see https://twig.symfony.com/doc/3.x/filters/format_datetime.html #}
+	{% if date is iterable and date.date is defined and date.timezone is defined %}
+	    {% set date = date.date %}
+	{% endif %}
 
-        {% if difference_obj.invert == 1 %}
-            {% set difference = - difference_obj.days %}
-        {% endif %}
+	{% set difference_obj = date("now").diff(date(date)) %}
+	{% set difference = difference_obj.days %}
 
-        {% set class = 'success' %}
-        {% if difference < 0 %}
-            {% set class = 'danger' %}
-        {% elseif difference < 30 %}
-            {% set class = 'warning' %}
-        {% endif %}
+	{% if datetype is defined and datetype == 'expiration' %}
 
-    {% else %}
+		{% if difference_obj.invert == 1 %}
+		    {% set difference = - difference_obj.days %}
+		{% endif %}
 
-        {% set class = 'danger' %}
-        {% if difference < 30 %}
-            {% set class = 'success' %}
-        {% elseif difference < 365 %}
-            {% set class = 'warning' %}
-        {% endif %}
+		{% set class = 'success' %}
 
-    {% endif %}
+		{% if difference < 0 %}
+			{% set class = 'danger' %}
+		{% elseif difference < 30 %}
+			{% set class = 'warning' %}
+		{% endif %}
 
-    {% set format = 'd/m/Y' %}
-    {% if hour is defined or hours is defined %}{% set format = 'd/m/Y H:i' %}{% endif %}
-    {% if second is defined or seconds is defined %}{% set format = 'd/m/Y H:i:s' %}{% endif %}
+	{% else %}
 
-    {% if balise is not defined %}
-    {% set balise = 'small' %}
-    {% endif %}
+		{% set class = 'danger' %}
 
-    <{{ balise}} class="text-nowrap" title="{{ date|date(format) }}">{{ date|date(format) }}
-    {% if difference != 0 %}
-        <span class="badge bg-{{ class }}">{{ difference }} jour{% if difference > 1 %}s{% endif %}</span>
-    {% endif %}
-    </{{ balise }}>
+		{% if difference < 30 %}
+			{% set class = 'success' %}
+		{% elseif difference < 365 %}
+			{% set class = 'warning' %}
+		{% endif %}
 
-    {% endif %}
+	{% endif %}
+
+	{% set format = 'd/m/Y' %}
+
+	{% if hour is defined or hours is defined %}
+		{% set format = 'd/m/Y H:i' %}
+	{% endif %}
+	{% if second is defined or seconds is defined %}
+		{% set format = 'd/m/Y H:i:s' %}
+	{% endif %}
+
+	{% if balise is not defined %}
+		{% set balise = 'small' %}
+	{% endif %}
+
+	<{{balise}} class="text-nowrap" title="{{ date|date(format) }}">{{ date|date(format) }}
+		{% if difference != 0 %}
+			<span class="badge bg-{{ class }}">{{ difference }}
+				jour
+				{% if difference > 1 %}s
+				{% endif %}
+			</span>
+		{% endif %}
+	</{{balise}}>
+
+{% endif %}
