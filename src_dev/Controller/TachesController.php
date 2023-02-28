@@ -30,7 +30,7 @@ class TachesController extends AbstractController
             ] ;
 
             $tache = new Tache() ;
-            $tache->setMethod('App\\Services\\DemoService::demo') ;
+            $tache->setMethod('App\\Services\\DemoService:demo2') ;
             $tache->setParametres($parametres) ;
             //$tache->setFichier($data['fichier']) ;
             //$tache->setParametresCaches'(['tokenSSO' => $user->getApidaeToken()]) ;

@@ -5,11 +5,14 @@ namespace App\Services ;
 use Psr\Log\LoggerInterface;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use ApidaeTourisme\ApidaeBundle\Config\TachesCode;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
 
 class DemoService
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $tachesLogger,
+        private TachesServices $tachesServices
+    ) {
     }
     /**
      * Exemple type de tâche lancée par le gestionnaire de tâche :
@@ -17,7 +20,7 @@ class DemoService
      */
     public static function demo(Tache $tache): TachesCode
     {
-        $steps = 2 ;
+        $steps = 99 ;
         $logger_context = ['id' => $tache->getId(), 'steps' => $steps] ;
         $step = 1 ;
         do {
@@ -29,9 +32,10 @@ class DemoService
              */
             //$this->logger->info('Début de l\'étape...', $logger_context) ;
             // Do whatever this task has to do
-            sleep(1) ;
+            sleep(5) ;
             $step++ ;
             $tache->log('info', 'Fin de l\'étape '.$step.'...');
+            //$this->tachesServices->save($tache) ;
             //$this->logger->info('Etape terminée !', $logger_context) ;
         } while ($step <= $steps) ;
 
@@ -43,16 +47,23 @@ class DemoService
     */
     public function demo2(Tache $tache): TachesCode
     {
-        $laTacheSeDerouleBien = false ;
-        $ilYAUnTrucBizarre = true ;
+        $steps = 99 ;
+        $logger_context = ['id' => $tache->getId(), 'steps' => $steps] ;
+        $step = 1 ;
+        do {
+            $logger_context['step'] = $step ;
+            $this->tachesLogger->info('Début de l\'étape...', $logger_context) ;
+            $tache->log('info', 'Début de l\'étape '.$step.'...');
+            $this->tachesServices->save($tache) ;
+            // Do whatever this task has to do
+            sleep(5) ;
+            $step++ ;
 
-        if ($ilYAUnTrucBizarre) {
-            return TachesCode::INVALID ;
-        }
+            $this->tachesLogger->info('Fin de l\'étape...', $logger_context) ;
+            $tache->log('info', 'Fin de l\'étape '.$step.'...');
+            $this->tachesServices->save($tache) ;
+        } while ($step <= $steps) ;
 
-        if ($laTacheSeDerouleBien) {
-            return TachesCode::SUCCESS ;
-        }
-        return TachesCode::FAILURE ;
+        return TachesCode::SUCCESS ;
     }
 }

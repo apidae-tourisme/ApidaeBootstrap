@@ -25,6 +25,7 @@ services:
             #- "../src_dev/Entity/"
             - "../src_dev/Kernel.php"
             # - "../src_dev/Controller/"
+        public: true
 
     apidaebundle:
         namespace: ApidaeTourisme\ApidaeBundle\

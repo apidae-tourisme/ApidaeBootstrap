@@ -54,26 +54,26 @@ class TachesManagerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->logger->debug('Starting '.self::getDefaultName()) ;
+        $this->tachesLogger->debug('Starting '.self::getDefaultName()) ;
 
         for ($i = 1 ; $i <= $this->APIDAEBUNDLE_TACHES_LOOP ; $i++) {
             $this->tachesServices->monitorRunningTasks() ;
             $running = $this->tacheRepository->getTachesNumberByStatus('RUNNING') ;
 
             if ($running > $this->APIDAEBUNDLE_TACHES_MAX) {
-                $this->logger->debug($running . '/'.$this->APIDAEBUNDLE_TACHES_MAX.' tâches sont déjà en cours : aucune autre tâche ne sera lancée') ;
+                $this->tachesLogger->debug($running . '/'.$this->APIDAEBUNDLE_TACHES_MAX.' tâches sont déjà en cours : aucune autre tâche ne sera lancée') ;
             } else {
                 $next = $this->tacheRepository->getTacheToRun();
 
                 if ($next) {
-                    $this->logger->info('Une tâche en attente va être exécutée : tachesServices->startByProcess($tache)', [
+                    $this->tachesLogger->info('Une tâche en attente va être exécutée : tachesServices->startByProcess($tache)', [
                         'command' => self::getDefaultName(),
                         'id' => $next->getId(),
                         'tache' => $next->getMethod()
                     ]) ;
                     $this->tachesServices->startByProcess($next) ;
                 } else {
-                    $this->logger->debug('Aucune tâche en attente n\'a été trouvée') ;
+                    $this->tachesLogger->debug('Aucune tâche en attente n\'a été trouvée') ;
                 }
             }
             if ($i != $this->APIDAEBUNDLE_TACHES_LOOP) {

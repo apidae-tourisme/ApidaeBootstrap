@@ -70,31 +70,33 @@ class TacheController extends AbstractController
     }
 
     #[Route('/stop/{id}', name: 'stop')]
-    public function stop(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository)
+    public function stop(string $id, TachesServices $tachesServices, TacheRepository $tacheRepository)
     {
         $tache = $tacheRepository->findOneBy(['id' => $id]);
         return new JsonResponse($tachesServices->stop($tache));
     }
 
     #[Route('/delete/{id}', name: 'delete')]
-    public function delete(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository)
+    public function delete(string $id, TachesServices $tachesServices, TacheRepository $tacheRepository)
     {
         $tache = $tacheRepository->getTacheById($id);
-        $ret = [];
         if (!$tache) {
-            $ret['error'] = 'Tâche introuvable';
-        } else {
-            /**
-             * @var User $user
-             */
-            $user = $this->getUser();
-            if ($tache->getUserEmail() == $user->getEmail()) {
-                $ret = $tachesServices->delete($id);
-            } else {
-                $ret['error'] = 'l\'utilisateur #' . $user->getEmail() . ' ne peut pas supprimer une tâche #' . $id . ' de l\'utilisateur #' . $tache->getUserEmail();
-            }
+            return new JsonResponse(['error' => 'Tâche introuvable'], 404) ;
         }
-        return new JsonResponse($ret);
+
+        /**
+         * @var User $user
+         */
+        $user = $this->getUser();
+        if ($tache->getUserEmail() !== $user->getEmail()) {
+            return new JsonResponse(['error' => 'l\'utilisateur #' . $user->getEmail() . ' ne peut pas supprimer une tâche #' . $id . ' de l\'utilisateur #' . $tache->getUserEmail()], 403) ;
+        }
+
+        if ($tachesServices->delete($tache)) {
+            return new JsonResponse(['code' => 'SUCCESS']) ;
+        }
+
+        return new JsonResponse(['error' => 'UNKNOWN_ERROR'], 500) ;
     }
 
     #[Route('/download/{id}', name: 'download')]

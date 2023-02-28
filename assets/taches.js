@@ -102,11 +102,12 @@ function tacheRefresh(id) {
 
 function tacheDelete(id) {
     var ajax = jQuery.ajax({
-        'url': apidaebundle_taches_path + '/delete/' + id,
-        'data': { 'force': 1 }
+        url: apidaebundle_taches_path + '/delete/' + id,
+        data: { 'force': 1 },
+        dataType: 'json'
     });
     ajax.done(function (data) {
-        if (data == true) {
+        if (data.code == 'SUCCESS') {
             jQuery('[data-tacheid="' + id + '"]').remove();
         }
     });

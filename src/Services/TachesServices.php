@@ -39,7 +39,7 @@ class TachesServices
     public function __construct(
         protected EntityManagerInterface $em,
         protected TacheRepository $tacheRepository,
-        LoggerInterface $tachesLogger,
+        protected LoggerInterface $tachesLogger,
         protected Security $security,
         protected KernelInterface $kernel,
         protected ParameterBagInterface $params,
@@ -47,7 +47,6 @@ class TachesServices
         protected SluggerInterface $slugger
     ) {
         $this->dossierTaches = $this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') ;
-        $this->logger = $tachesLogger ;
         $this->container = $kernel->getContainer() ;
     }
 
@@ -108,12 +107,12 @@ class TachesServices
                 $this->filesystem->remove($tachePath);
                 $this->filesystem->mkdir($tachePath, 0777);
             } catch (IOException $e) {
-                $this->logger->error(__METHOD__ . ':' . $e->getMessage());
+                $this->tachesLogger->error(__METHOD__ . ':' . $e->getMessage());
                 return false;
             }
 
                         if (!in_array($params['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
-                            $this->logger->error(__METHOD__ . ': Type de fichier non autorisé');
+                            $this->tachesLogger->error(__METHOD__ . ': Type de fichier non autorisé');
                             return false;
                         }
                         $originalFilename = pathinfo($params['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
@@ -125,7 +124,7 @@ class TachesServices
                     $filename
                 );
             } catch (FileException $e) {
-                $this->logger->error(__METHOD__ . ': Déplacement du fichier impossible');
+                $this->tachesLogger->error(__METHOD__ . ': Déplacement du fichier impossible');
                 return false;
             }
 
@@ -149,7 +148,7 @@ class TachesServices
         $path = $this->kernel->getProjectDir() . '/bin/console';
 
         $cl = $path . ' '.TacheCommand::getDefaultName().' ' . $tache->getId();
-        $this->logger->info(__METHOD__ . ' => new Process ' . $cl);
+        $this->tachesLogger->info(__METHOD__ . ' => new Process ' . $cl);
 
 
         /**
@@ -223,7 +222,7 @@ class TachesServices
      */
     public function run(Tache $tache): TachesCode
     {
-        $this->logger->info(__METHOD__.'('.$tache->getId().')') ;
+        $this->tachesLogger->info(__METHOD__.'('.$tache->getId().')') ;
 
         /**
          * @var int $ret
@@ -231,23 +230,23 @@ class TachesServices
         $ret = TachesCode::FAILURE ;
 
         // Méthode non statique : App\Class:method
-        if (preg_match("#^([a-zA-Z\\\]+):([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
+        if (preg_match("#^([a-zA-Z\\\]+):([a-zA-Z0-9]+)$#", $tache->getMethod(), $match)) {
             /**
              * @see https://www.php.net/manual/en/function.is-callable.php#126199
              * Impossible d'utiliser is_callable ici pour une méthode non statique
              */
             //if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
             if (! method_exists($match[1], $match[2])) {
-                $this->logger->error('Méthode invalide : '.$tache->getMethod()) ;
+                $this->tachesLogger->error('Méthode invalide : '.$tache->getMethod()) ;
                 return TachesCode::FAILURE ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
                 if ($rm->isStatic()) {
-                    $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode est statique, utilisez :: au lieu de :)') ;
+                    $this->tachesLogger->error('Méthode invalide : '.$tache->getMethod().' (la méthode est statique, utilisez :: au lieu de :)') ;
                     return TachesCode::FAILURE ;
                 }
             }
-            $this->logger->info(__METHOD__.' : starting : '.lcfirst($match[1]).'->'.$match[2].'(...)') ;
+            $this->tachesLogger->info(__METHOD__.' : starting : '.lcfirst($match[1]).'->'.$match[2].'(...)') ;
             /**
              * On s'apprète à lancer une méthode sur un service dont on n'a pas connaissance :
              * App\Services\Whatever->method(...)
@@ -266,19 +265,19 @@ class TachesServices
         // Méthode statique : App\Class::method
         elseif (preg_match("#^([a-zA-Z\\\]+)::([a-zA-Z]+)$#", $tache->getMethod(), $match)) {
             if (! is_callable([$match[1],$match[2]], false, $callable_name)) {
-                $this->logger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
+                $this->tachesLogger->error('Méthode invalide : '.$tache->getMethod().' ('.$callable_name.')') ;
                 return TachesCode::FAILURE ;
             } else {
                 $rm = new ReflectionMethod($match[1], $match[2]);
                 if (! $rm->isStatic()) {
-                    $this->logger->error('Méthode invalide : '.$tache->getMethod().' (la méthode n\'est pas statique, utilisez : au lieu de ::)') ;
+                    $this->tachesLogger->error('Méthode invalide : '.$tache->getMethod().' (la méthode n\'est pas statique, utilisez : au lieu de ::)') ;
                     return TachesCode::FAILURE ;
                 }
             }
 
             $ret = call_user_func($match[1].'::'.$match[2], $tache);
         } else {
-            $this->logger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getMethod().' est incohérence') ;
+            $this->tachesLogger->error('Impossible d\'exécuter la tâche : la commande '.$tache->getMethod().' est incohérence') ;
         }
 
         return $ret;
@@ -339,14 +338,11 @@ class TachesServices
         $this->save($tache);
     }
 
-    public function delete(int $tacheId)
+    public function delete(Tache $tache)
     {
-        $tache = $this->tacheRepository->getTacheById($tacheId);
-        if (!$tache) {
-            return false;
-        }
         $this->filesystem->remove($this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') . $tache->getId());
-        $this->save($tache);
+        $this->em->remove($tache) ;
+        $this->em->flush() ;
         return true;
     }
 
