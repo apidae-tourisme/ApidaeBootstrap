@@ -26,27 +26,16 @@ class TachesManagerCommand extends Command
 {
     protected LoggerInterface $logger;
 
-    /**
-     * @var int SLEEPTIME Durée d'attente entre chaque boucle
-     */
-    public const SLEEPTIME = 6;
-    /**
-     * Nombre de tâches lancées en même temps
-     */
-    public const MAX_TACHES = 5 ;
-    /**
-     * @var int LOOP Nombre de boucles par manager lancée
-     */
-    public const LOOP = 10 ;
-
     public function __construct(
-        LoggerInterface $tachesLogger,
+        protected LoggerInterface $tachesLogger,
         protected EntityManagerInterface $entityManager,
         protected Filesystem $filesystem,
         protected TacheRepository $tacheRepository,
-        protected TachesServices $tachesServices
+        protected TachesServices $tachesServices,
+        protected $APIDAEBUNDLE_TACHES_SLEEP,
+        protected $APIDAEBUNDLE_TACHES_LOOP,
+        protected $APIDAEBUNDLE_TACHES_MAX
     ) {
-        $this->logger = $tachesLogger;
         parent::__construct();
     }
 
@@ -67,17 +56,18 @@ class TachesManagerCommand extends Command
     {
         $this->logger->debug('Starting '.self::getDefaultName()) ;
 
-        for ($i = 1 ; $i <= self::LOOP ; $i++) {
+        for ($i = 1 ; $i <= $this->APIDAEBUNDLE_TACHES_LOOP ; $i++) {
             $this->tachesServices->monitorRunningTasks() ;
             $running = $this->tacheRepository->getTachesNumberByStatus('RUNNING') ;
 
-            if ($running > self::MAX_TACHES) {
-                $this->logger->debug($running . '/'.self::FAILURE.' tâches sont déjà en cours : aucune autre tâche ne sera lancée') ;
+            if ($running > $this->APIDAEBUNDLE_TACHES_MAX) {
+                $this->logger->debug($running . '/'.$this->APIDAEBUNDLE_TACHES_MAX.' tâches sont déjà en cours : aucune autre tâche ne sera lancée') ;
             } else {
                 $next = $this->tacheRepository->getTacheToRun();
 
                 if ($next) {
                     $this->logger->info('Une tâche en attente va être exécutée : tachesServices->startByProcess($tache)', [
+                        'command' => self::getDefaultName(),
                         'id' => $next->getId(),
                         'tache' => $next->getMethod()
                     ]) ;
@@ -86,8 +76,8 @@ class TachesManagerCommand extends Command
                     $this->logger->debug('Aucune tâche en attente n\'a été trouvée') ;
                 }
             }
-            if ($i != self::LOOP) {
-                sleep(self::SLEEPTIME) ;
+            if ($i != $this->APIDAEBUNDLE_TACHES_LOOP) {
+                sleep($this->APIDAEBUNDLE_TACHES_SLEEP) ;
             }
         }
         return Command::SUCCESS;
