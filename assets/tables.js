@@ -10,6 +10,9 @@ jQuery(document).ready(function () {
         pageLength: 25,
         dom: '<<"top"lpif><t><"bottom"lpif>>',
         order: [],
+        columnDefs: [
+            { targets: 'no-sort', orderable: false }
+        ],
         lengthMenu: [[10, 25, 50, 100, 1000, -1], [10, 25, 50, 100, 1000, "Tous"]],
         language: {
             //url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/French.json',

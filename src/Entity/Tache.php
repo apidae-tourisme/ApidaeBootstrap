@@ -79,6 +79,11 @@ class Tache
      */
     private $pid;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $signature;
+
     private $realStatus;
 
     private LoggerInterface $logger ;
@@ -238,9 +243,20 @@ class Tache
         return $this->realStatus;
     }
 
-    public function setRealStatus($realStatus)
+    public function setRealStatus($realStatus): self
     {
         $this->realStatus = $realStatus;
+        return $this;
+    }
+
+    public function getSignature(): ?string
+    {
+        return $this->signature;
+    }
+
+    public function setSignature(?string $signature): self
+    {
+        $this->signature = $signature;
         return $this;
     }
 
@@ -276,6 +292,7 @@ class Tache
             'creationDate' => $this->getCreationdate(),
             'pid' => $this->getPid(),
             'realStatus' => $this->getRealStatus(),
+            'signature' => $this->getSignature()
         ];
         return $ret;
     }

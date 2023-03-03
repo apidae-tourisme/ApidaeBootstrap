@@ -1,7 +1,7 @@
     <table class="table dataTable taches" data-order="[[1,&quot;desc&quot;]]">
         <thead>
             <tr>
-                <th></th>
+                <th class="no-sort"></th>
                 <th>Dates</th>
                 {% if showId is not defined or showId == true %}<th>id</th>{% endif %}
                 {% if showuserEmail is not defined or showuserEmail == true %}<th>userEmail</th>{% endif %}
@@ -10,7 +10,7 @@
                 <th>status</th>
                 {% if showParametres is not defined or showParametres == true %}<th>parametres</th>{% endif %}
                 <th>result</th>
-                <th></th>
+                <th class="no-sort"></th>
             </tr>
         </thead>
         <tbody>

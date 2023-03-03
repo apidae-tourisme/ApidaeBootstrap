@@ -32,10 +32,14 @@ class TachesController extends AbstractController
             $tache = new Tache() ;
             $tache->setMethod('App\\Services\\DemoService:demo2') ;
             $tache->setParametres($parametres) ;
+            $tache->setSignature('action1_sur_objetA') ;
             //$tache->setFichier($data['fichier']) ;
             //$tache->setParametresCaches'(['tokenSSO' => $user->getApidaeToken()]) ;
             $tache_id = $tachesServices->add($tache);
         }
+
+        $tache = $tacheRepository->getTacheBySignature('action1_sur_objetA') ;
+        dump($tache) ;
 
         $taches = $tacheRepository->findAll() ;
         return $this->render('demo/taches.html.twig', ['taches' => $taches, 'tache' => $tache]) ;

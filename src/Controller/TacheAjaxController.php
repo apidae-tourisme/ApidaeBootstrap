@@ -1,0 +1,112 @@
+<?php
+
+namespace ApidaeTourisme\ApidaeBundle\Controller ;
+
+use ApidaeTourisme\ApidaeBundle\Entity\Tache;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
+use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
+use Symfony\Component\Process\Process;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+
+#[Route('/apidaebundle/taches', name: 'apidaebundle_taches_')]
+class TacheAjaxController extends AbstractController
+{
+    #[Route('/start/{id}', name: 'start')]
+    public function start(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository): JsonResponse
+    {
+        $tache = $tacheRepository->findOneBy(['id' => $id]);
+        $pid = $tachesServices->startByProcess($tache, $request->get('force') == true);
+        return new JsonResponse([
+            'id' => (int)$tache->getId(),
+            'pid' => $pid,
+            'startdate' => $tache->getStartDate()
+        ]);
+    }
+
+    #[Route('/stop/{id}', name: 'stop')]
+    public function stop(string $id, TachesServices $tachesServices, TacheRepository $tacheRepository): JsonResponse
+    {
+        $tache = $tacheRepository->findOneBy(['id' => $id]);
+        return new JsonResponse($tachesServices->stop($tache));
+    }
+
+    #[Route('/delete/{id}', name: 'delete')]
+    public function delete(string $id, TachesServices $tachesServices, TacheRepository $tacheRepository): JsonResponse
+    {
+        $tache = $tacheRepository->getTacheById($id);
+        if (!$tache) {
+            return new JsonResponse(['error' => 'Tâche introuvable'], 404) ;
+        }
+
+        /**
+         * @var User $user
+         */
+        $user = $this->getUser();
+        if ($tache->getUserEmail() !== $user->getEmail()) {
+            return new JsonResponse(['error' => 'l\'utilisateur #' . $user->getEmail() . ' ne peut pas supprimer une tâche #' . $id . ' de l\'utilisateur #' . $tache->getUserEmail()], 403) ;
+        }
+
+        if ($tachesServices->delete($tache)) {
+            return new JsonResponse(['code' => 'SUCCESS']) ;
+        }
+
+        return new JsonResponse(['error' => 'UNKNOWN_ERROR'], 500) ;
+    }
+
+    #[Route('/monitor', name: 'monitor')]
+    public function monitor(Request $request)
+    {
+        return new JsonResponse(['temp' => 'temp']) ;
+    }
+
+    #[Route('/statusBy', name: 'statusBy')]
+    public function statusByIds(Request $request, TacheRepository $tacheRepository, TachesServices $tachesServices)
+    {
+        $id = (is_int((int)$request->get('id'))) ? $request->get('id') : null ;
+        $ids = (is_array($request->get('ids'))) ? $request->get('ids') : null ;
+        $signatures = (is_array($request->get('signatures'))) ? $request->get('signatures') : null ;
+        $signature = (is_string($request->get('signature'))) ? $request->get('signature') : null ;
+
+        $taches = [] ;
+        if ($ids !== null) {
+            $taches = $tacheRepository->findBy('id', $ids) ;
+        } elseif ($id !== null) {
+            $taches = $tacheRepository->findBy('id', $id) ;
+        } elseif ($signatures !== null) {
+            $taches = $tacheRepository->findLastBySignature($signatures) ;
+        } elseif ($signature !== null) {
+            $taches = $tacheRepository->findLastBySignature($signature) ;
+        }
+
+        if (sizeof($taches) == 0) {
+            return new JsonResponse(['code'=>404], 404) ;
+        }
+
+        /**
+         * @var User $user
+         */
+        $user = $this->getUser();
+        $response = [] ;
+        foreach ($taches as $tache) {
+            $tachesServices->setRealStatus([$tache]);
+            $tache = $tacheRepository->getTacheById($tache->getId()); // refresh
+            $tmp = $tache->get() ;
+            if ($tache->getUserEmail() != $user->getEmail()) {
+                unset($tmp['parametresCaches']);
+            }
+
+            $tmp['status_html'] = $this->render('taches/status.html.twig', ['tache' => $tache])->getContent() ;
+
+            $response[] = $tmp ;
+        }
+
+        return new JsonResponse($response);
+    }
+}

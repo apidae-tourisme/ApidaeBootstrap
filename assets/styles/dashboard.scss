@@ -157,11 +157,6 @@ table.dataTable.no-footer {
   border-bottom: rgba(0, 0, 0, .4) !important;
 }
 
-table.table {
-  background: white;
-  @include text-block();
-}
-
 table.table ul {
   margin-bottom: 0;
   padding-left: 1.4em;

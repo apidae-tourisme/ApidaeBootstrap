@@ -2,28 +2,32 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Controller ;
 
-use ApidaeTourisme\ApidaeBundle\Entity\Tache;
-use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
-use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 use Symfony\Component\Process\Process;
+use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 #[Route('/apidaebundle/taches', name: 'apidaebundle_taches_')]
 class TacheController extends AbstractController
 {
-    public function __construct(protected TachesServices $tachesServices)
-    {
+    public function __construct(
+        protected TachesServices $tachesServices,
+        protected TacheRepository $tacheRepository,
+        protected KernelInterface $kernel
+    ) {
     }
 
     #[Route('/mestaches', name: 'mestaches')]
-    public function mestaches(TacheRepository $tacheRepository, KernelInterface $kernel, TachesServices $tachesServices)
+    public function mestaches()
     {
         $this->tachesServices->monitorRunningTasks();
 
@@ -31,11 +35,11 @@ class TacheController extends AbstractController
          * @var User $user
          */
         $user = $this->getUser();
-        $taches = $tacheRepository->findBy(['userEmail' => $user->getEmail()]);
-        $taches = $tachesServices->setRealStatus($taches);
+        $taches = $this->tacheRepository->findBy(['userEmail' => $user->getEmail()]);
+        $taches = $this->tachesServices->setRealStatus($taches);
 
         $alerts = [];
-        if (!is_writable($kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {
+        if (!is_writable($this->kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {
             $alerts[] = ['type' => 'warning', 'message' => 'Attention, le dossier de stockage des tâches n\'est pas accessible en écriture pour ' . get_current_user()];
         }
 
@@ -43,68 +47,26 @@ class TacheController extends AbstractController
     }
 
     #[Route('/manager', name: 'manager')]
-    public function manager(TacheRepository $tacheRepository, KernelInterface $kernel, TachesServices $tachesServices)
+    public function manager()
     {
         $this->tachesServices->monitorRunningTasks();
 
-        $taches = $tacheRepository->findAll();
-        $taches = $tachesServices->setRealStatus($taches);
+        $taches = $this->tacheRepository->findAll();
+        $taches = $this->tachesServices->setRealStatus($taches);
 
         $alerts = [];
-        if (!is_writable($kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {
+        if (!is_writable($this->kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {
             $alerts[] = ['type' => 'warning', 'message' => 'Attention, le dossier de stockage des tâches n\'est pas accessible en écriture pour ' . get_current_user()];
         }
         return $this->render('taches/list.html.twig', ['taches' => $taches, 'alerts' => $alerts]);
     }
 
-    #[Route('/start/{id}', name: 'start')]
-    public function start(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository)
-    {
-        $tache = $tacheRepository->findOneBy(['id' => $id]);
-        $pid = $tachesServices->startByProcess($tache, $request->get('force') == true);
-        return new JsonResponse([
-            'id' => (int)$tache->getId(),
-            'pid' => $pid,
-            'startdate' => $tache->getStartDate()
-        ]);
-    }
-
-    #[Route('/stop/{id}', name: 'stop')]
-    public function stop(string $id, TachesServices $tachesServices, TacheRepository $tacheRepository)
-    {
-        $tache = $tacheRepository->findOneBy(['id' => $id]);
-        return new JsonResponse($tachesServices->stop($tache));
-    }
-
-    #[Route('/delete/{id}', name: 'delete')]
-    public function delete(string $id, TachesServices $tachesServices, TacheRepository $tacheRepository)
-    {
-        $tache = $tacheRepository->getTacheById($id);
-        if (!$tache) {
-            return new JsonResponse(['error' => 'Tâche introuvable'], 404) ;
-        }
-
-        /**
-         * @var User $user
-         */
-        $user = $this->getUser();
-        if ($tache->getUserEmail() !== $user->getEmail()) {
-            return new JsonResponse(['error' => 'l\'utilisateur #' . $user->getEmail() . ' ne peut pas supprimer une tâche #' . $id . ' de l\'utilisateur #' . $tache->getUserEmail()], 403) ;
-        }
-
-        if ($tachesServices->delete($tache)) {
-            return new JsonResponse(['code' => 'SUCCESS']) ;
-        }
-
-        return new JsonResponse(['error' => 'UNKNOWN_ERROR'], 500) ;
-    }
-
     #[Route('/download/{id}', name: 'download')]
-    public function download(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository, KernelInterface $kernel)
+    public function download(string $id)
     {
-        $tache = $tacheRepository->getTacheById($id);
+        $tache = $this->tacheRepository->getTacheById($id);
         if (!$tache) {
-            throw new \Exception('Tache introuvable');
+            throw new \Exception('Tâche introuvable');
         } else {
             /**
              * @var User $user
@@ -115,7 +77,7 @@ class TacheController extends AbstractController
             }
         }
 
-        $response = new BinaryFileResponse($kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder') . $tache->getId() . '/' . $tache->getFichier());
+        $response = new BinaryFileResponse($this->kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder') . $tache->getId() . '/' . $tache->getFichier());
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $tache->getFichier()
@@ -124,15 +86,19 @@ class TacheController extends AbstractController
     }
 
     #[Route('/status/{id}', name: 'status')]
-    public function status(string $id, Request $request, TacheRepository $tacheRepository, TachesServices $tachesServices)
+    public function status(int $id, Request $request)
     {
         $_format = (in_array($request->get('_format'), ['html', 'json'])) ? $request->get('_format') : 'html';
-        $tache = $tacheRepository->getTacheById($id);
+        $tache = $this->tacheRepository->getTacheById($id);
         if (!$tache) {
-            throw new \Exception('Tache introuvable');
+            if ($_format == 'json') {
+                return new JsonResponse(['code'=>404], 404) ;
+            } else {
+                return new Response('Tache introuvable');
+            }
         }
-        $tachesServices->setRealStatus([$tache]);
-        $tache = $tacheRepository->getTacheById($id);
+        $this->tachesServices->setRealStatus([$tache]);
+        $tache = $this->tacheRepository->getTacheById($id);
 
         if ($_format == 'json') {
             $ret = $tache->get();
@@ -146,7 +112,6 @@ class TacheController extends AbstractController
             return new JsonResponse($ret);
         }
 
-
         return $this->render(
             'taches/status.' . $_format . '.twig',
             ['tache' => $tache]
@@ -154,14 +119,14 @@ class TacheController extends AbstractController
     }
 
     #[Route('/result/{id}', name: 'result')]
-    public function result(string $id, TacheRepository $tacheRepository, TachesServices $tachesServices)
+    public function result(string $id)
     {
-        $tache = $tacheRepository->getTacheById($id);
+        $tache = $this->tacheRepository->getTacheById($id);
         if (!$tache) {
             throw new \Exception('Tache introuvable');
         }
-        $tachesServices->setRealStatus([$tache]);
-        $tache = $tacheRepository->getTacheById($id);
+        $this->tachesServices->setRealStatus([$tache]);
+        $tache = $this->tacheRepository->getTacheById($id);
 
         return $this->render(
             'taches/result.html.twig',
@@ -174,14 +139,14 @@ class TacheController extends AbstractController
      * @todo : on vérifie que l'utilisateur qui cherche à accéder a les droit sur la tâche ou pas ?
      */
     #[Route('/tache/{id}', name: 'tache')]
-    public function tache(string $id, TacheRepository $tacheRepository, TachesServices $tachesServices)
+    public function tache(string $id)
     {
-        $tache = $tacheRepository->getTacheById($id);
+        $tache = $this->tacheRepository->getTacheById($id);
         if (!$tache) {
             throw new \Exception('Tache introuvable');
         }
-        $tachesServices->setRealStatus([$tache]);
-        $tache = $tacheRepository->getTacheById($id);
+        $this->tachesServices->setRealStatus([$tache]);
+        $tache = $this->tacheRepository->getTacheById($id);
 
         return $this->render(
             'taches/tache.html.twig',

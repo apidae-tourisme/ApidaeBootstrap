@@ -1,0 +1,84 @@
+{% extends 'demo/index.html.twig' %}
+
+{% block main %}
+
+    {% set actions = ['A','B'] %}
+
+    {% for action in actions %}
+        <a href="{{ path(app.request.get('_route'),{action:action, cibles:'all'}) }}" class="btn btn-danger">Action {{ action }} sur tous les objets</a>
+    {% endfor %}
+
+    <hr />
+    <h2>Monitoring serveur</h2>
+
+    <p>Informations fournies lors du rendu de la page</p>
+
+    <h3>par id de tâche</h3>
+    <code>render(path('apidaebundle_taches_status', {id:tacheDemoId}))</code>
+    <br />
+    {{ render(path('apidaebundle_taches_status', {id:tacheDemoId})) }}
+
+    <h3>Monitoring à partir de la tâche</h3>
+    <code>include 'taches/status.html.twig' with { tache : tacheDemo}</code>
+    <br />
+    {% include 'taches/status.html.twig' with { tache : tacheDemo} %}
+    <hr />
+
+    <h2>Monitoring JS</h2>
+
+    <h3>par signature</h3>
+    <code>{{ '<div class="tache" data-signature="A_sur_1"></div>'|escape('html') }}</code>
+    <br />
+    <div class="tache" data-signature="A_sur_1"></div>
+
+    <h1>Exemple d'exploitation des tâches</h1>
+    <table class="dataTable table table-striped">
+        <thead>
+            <tr>
+                <th>Objets</th>
+                {% for action in actions %}
+                    <th>Action {{ action }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for o in 1..200 %}
+            <tr>
+                <th>Objet {{ o }}</th>
+                {% for action in actions %}
+                    <td>
+                        <span class="tache" data-signature="{{action}}_sur_{{o}}"></span>
+                        <a href="#" data-parameters='{"action":"{{ action }}", "cible":"{{ o }}"}' class="btn btn-info">Action {{ action }}</a>
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+<script>
+    jQuery(document).on('click','a.btn[data-parameters]',function(e){
+        e.preventDefault() ;
+        var btn = jQuery(this) ;
+        if ( ! btn.hasClass('loading') ) {
+            btn.addClass('loading') ;
+            var ajax = jQuery.post({
+                url: "{{ path('app_demo_addTache') }}",
+                data: {
+                    action:jQuery(this).data('parameters').action,
+                    cible:jQuery(this).data('parameters').cible,
+                }
+            }) ;
+            ajax.done(function(data) {
+                console.log('Tâche lancée !') ;
+                btn.replaceWith(data) ;
+            }) ;
+            ajax.fail(function(data){
+                console.log('fail',data) ;
+                alert('fail') ;
+            }) ;
+        }
+    }) ;
+</script>
+
+{% endblock %}

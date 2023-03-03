@@ -74,4 +74,58 @@ class TacheRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function getTacheBySignature(string $signature): Tache|null
+    {
+        return $this->findOneBy(['signature' => $signature], ['creationdate' =>'ASC']) ;
+    }
+
+    public function getTachesBySignature(string $signature): array
+    {
+        return $this->findBy(['signature' => $signature], ['creationdate' =>'ASC']) ;
+    }
+
+    public function findLastBySignature(mixed $valeurs): array|null
+    {
+        if (!in_array('signature', ['id', 'signature'])) {
+            return [] ;
+        }
+
+        $qb = $this->createQueryBuilder('t')
+            ->orderBy('t.creationdate', 'DESC')
+            ->setParameter('signature', $valeurs) ;
+
+        if (is_array($valeurs)) {
+            $qb->andWhere('t.signature in (:signature)') ;
+        } else {
+            $qb->andWhere('t.signature = :signature') ;
+        }
+
+        $query = $qb->getQuery() ;
+        $results = $query->getResult();
+
+        $toFind = is_array($valeurs) ? array_flip(array_values($valeurs)) : [$valeurs => $valeurs] ;
+
+        $return = [] ;
+        foreach ($results as $r) {
+            if (sizeof($toFind) == 0) {
+                break ;
+            }
+            if (isset($toFind[$r->getSignature()])) {
+                unset($toFind[$r->getSignature()]) ;
+                $return[] = $r ;
+            }
+        }
+
+        return $return ;
+    }
+
+    public function findLast(): Tache|null
+    {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.creationdate', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

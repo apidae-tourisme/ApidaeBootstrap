@@ -2,7 +2,7 @@
 Le plus souvent à partir d'un controler (après clic sur un bouton, envoi d'un formulaire...) :
 
 ```php
-use ApidaeTourisme\ApidaeBundle\Services\TachesServices ; // $tachesServices (service)
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices ;
 
 $tache = new Tache();
 $tache->setMethod('App\\Services\\TIFService:extractAll');
@@ -10,16 +10,114 @@ $tache->setParametres(['source' => $source]);
 $tachesServices->add($tache) ;
 ```
 
+Méthode statique :
+```
+App\\Services\\TIFService::extractAll
+```
+Méthode non statique :
+```
+App\\Services\\TIFService:extractAll
+```
+
+Globalement on préferera utiliser des méthodes non statiques parce qu'elles permettent de récupérer les services par autowire.
+
 # Lancer le gestionnaire de tâche
 ```bash
 bin/console apidae:tachesManager:start
 ```
 
-# Lancer une tâche seule (ex: id 18)
-C'est exactement ce que ferait le gestionnaire de tâche à partir des tâches TO_RUN : il relance une commande
+Il doit théoriquement tourner en permanence sur le serveur.
+
+En général on positionne une tâche cron qui le lance toutes les minutes :
+Chaque lancement de la commande déclenche `APIDAEBUNDLE_TACHES_LOOP=10` tours avec un sleep de `APIDAEBUNDLE_TACHES_SLEEP=6` secondes (donc pourra lancer au maximum 10 tâches par secondes).
+
+Ces variable sont ajustables par `.env`.
+
+En local, on peut le lancer une seule fois en le configurant pour faire des cycles plus longs :
 ```bash
-bin/console apidae:tache:run 18
+# .env.local
+APIDAEBUNDLE_TACHES_LOOP=10000
 ```
+
+# Lancer une tâche seule (ex: id 18)
+Le gestionnaire de tâches n'exécute pas les tâches lui même (on ne maitriserait pas son temps d'exécution ni les risques de plantage) :
+
+Il se contente de lancer les tâches `TO_RUN` de façon unitaire :
+```bash
+bin/console apidae:tache:run 18 -vv
+```
+
+On peut donc aussi utiliser cette commande en bash pour lancer une tâche à la main.
+
+Le `-vv` rend la commande plus verbeuse, ce qu'on souhaite en général faire quand on la lance à la main.
+
+# Ajouter une tâche par IHM
+L'ajout d'une tâche peut se faire suite à une action IHM, y compris en ajax, mais doit toujours être contrôlé côté serveur.
+
+Il n'y a pas de méthode automatique proposée par ce bundle pour créer une nouvelle tâche par IHM : c'est à l'application de s'auto-gérer pour la création de la tâche (ajax ou non).
+
+Le statut `TO_RUN` est affecté automatiquement et la tâche devra être lancée par le gestionnaire de tâche.
+
+```php
+$tache = new Tache() ;
+$tache->setMethod('App\\Services\\DemoService:demo2') ;
+$tache->setParametres($parametres) ;
+$tache->setSignature('action1_sur_objetA') ;
+$tache_id = $tachesServices->add($tache);
+```
+
+# Monitoring IHM
+
+## Monitoring IHM côté serveur (au chargement de la page)
+La plupart du temps on va chercher à afficher les infos d'une tâche sur l'IHM à partir d'infos récupérées côté serveur (donc dans le controller).
+
+### Afficher le statut d'une tâche
+#### Utiliser le template twig en lui passant une tâche
+Suppose d'avoir récupéré la tâche côté controller et de l'avoir passé à twig :
+```php
+// src/Controller/MaPageController.php
+$taches = $this->tacheRepository->findBy([...]);
+$this->render('mapage.html.twig',['taches' => $taches]) ;
+```
+```twig
+{# templates/mapage.html.twig #}
+{% for tache in taches %}
+    {% include 'taches/status.html.twig' with {tache:tache} %}
+{% endfor %}
+```
+#### Demander à twig de générer le rendu d'une tâche à partir de son id
+C'est plus simple, mais plus lourd aussi puisqu'ici, on va demander à twig d'appeler la fonction `ApidaeBundle\Controller\TacheController::status` (path `apidaebundle_taches_status`), qui va donc aller rechercher la tâche en bdd de façon unitaire.
+C'est intéressant pour une poignée de tâches mais pas sur un listing donc on ne maîtrise pas le volume.
+```twig
+{{ render(path('apidaebundle_taches_status', {id:33})) }}
+```
+
+## Monitoring JS des tâches par IHM
+Lors du chargement d'une page, et tout au long de son affichage, le bundle tentera de monitorer les tâches :
+
+### Par signature
+```html
+<span class="tache" data-signature="tache_truc_b"></span>
+```
+Lorsque ce bloc html est rencontré dans la page, le monitoring JS tentera de trouver la dernière tâche possédant cette signature, et d'en afficher les informations.
+Seule la dernière tâche avec cette signature sera affichée.
+
+### Par identifiant de tâche
+```html
+<span class="tache" data-signature="tache_truc_b"></span>
+```
+
+### Both
+```html
+<span class="tache" data-?="" data-status=["TO_RUN","FAILED","RUNNING"]'>
+```
+L'information data-status permet de n'afficher les infos de la tâche concernée (dernière tâche avec la signature ou par identifiant) que si elle est à l'un de ces états.
+Sinon, rien ne sera affiché.
+
+---
+---
+---
+---
 
 # TODO : refaire la partie ci-dessous
 

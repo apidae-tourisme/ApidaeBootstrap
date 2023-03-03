@@ -1,4 +1,4 @@
-
+{% if tache is defined and tache is not null %}
     {% if tache.status == 'TO_RUN' %}
         <span class="badge bg-primary status">{{ tache.status }}</span>
         <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id}) }}"><i class="fas fa-play"></i></a>
@@ -41,3 +41,4 @@
     {% else %}
         {{ tache.status }}
     {% endif %}
+{% endif %}

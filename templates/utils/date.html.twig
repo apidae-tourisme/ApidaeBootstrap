@@ -53,9 +53,7 @@
 	<{{balise}} class="text-nowrap" title="{{ date|date(format) }}">{{ date|date(format) }}
 		{% if difference != 0 %}
 			<span class="badge bg-{{ class }}">{{ difference }}
-				jour
-				{% if difference > 1 %}s
-				{% endif %}
+				jour{% if difference > 1 %}s{% endif %}
 			</span>
 		{% endif %}
 	</{{balise}}>
