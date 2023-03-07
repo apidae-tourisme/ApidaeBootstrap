@@ -29,5 +29,4 @@ import './taches.js';
 import './utils.js';
 
 const $ = require('jquery');
-console.log($.fn.jquery);
 global.$ = global.jQuery = $;

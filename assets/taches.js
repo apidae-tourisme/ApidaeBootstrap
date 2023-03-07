@@ -9,7 +9,7 @@ var tachesWatched = [];
 var frequence = 5000;
 var tacheDebug = false;
 
-var apidaebundle_taches_path = 'apidaebundle/taches';
+var apidaebundle_taches_path = '/apidaebundle/taches';
 
 import dateformat from 'dateformat';
 

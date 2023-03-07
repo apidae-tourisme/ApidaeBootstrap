@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% if app_env != 'prod' %} [{{app_env}}] &bull; {% endif %}{% block title %}Console Apidae{% endblock %}</title>
+        <title>{% if app_env != 'prod' %}[{{ app_env }}] &bull; {% endif %}{% block title %}Apidae Bundle{% endblock %}</title>
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -10,14 +10,7 @@
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
         <link rel="icon" href="{{ asset('build/images/favicon.ico') }}" />
-        <script
-            src="https://code.jquery.com/jquery-3.6.0.min.js"
-            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous"></script>
-        <link
-            rel="stylesheet"
-            href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"
-        />
+        {% if app_tagmanager_id is defined and app_tagmanager_id != "" %}
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id={{ app_tagmanager_id }}"></script>
         <script>
@@ -26,6 +19,7 @@
         gtag('js', new Date());
         gtag('config', '{{ app_tagmanager_id }}');
         </script>
+        {% endif %}
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
     </head>
     <body class="{{ app_env }} standalone">
