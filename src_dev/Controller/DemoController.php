@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DemoController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index()
+    public function index(TacheRepository $tacheRepository)
     {
         return $this->render('demo/index.html.twig');
     }

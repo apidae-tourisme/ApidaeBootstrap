@@ -2,11 +2,11 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Repository;
 
-use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
-use ApidaeTourisme\ApidaeBundle\Entity\Tache;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
+use ApidaeTourisme\ApidaeBundle\Entity\Tache;
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Tache|null find($id, $lockMode = null, $lockVersion = null)
@@ -85,39 +85,34 @@ class TacheRepository extends ServiceEntityRepository
         return $this->findBy(['signature' => $signature], ['creationdate' =>'ASC']) ;
     }
 
-    public function findLastBySignature(mixed $valeurs): array|null
+    /**
+     * @param array<string> Liste de signatures
+     * @return array<int> Identifiants
+     */
+    private function getTachesIdBySignatureFromView(array $valeurs): array
     {
-        if (!in_array('signature', ['id', 'signature'])) {
-            return [] ;
-        }
+        /**
+         * @see https://symfony.com/doc/current/doctrine.html#querying-with-sql
+         */
+        $conn = $this->getEntityManager()->getConnection() ;
+        $sql = ' select id from tache_by_signature where signature in (:signatures) ' ;
+        return $conn->executeQuery($sql, ['signatures' => $valeurs], ['signatures' => ArrayParameterType::STRING])->fetchFirstColumn() ;
+    }
+
+    public function findBySignatures(array $valeurs): array|null
+    {
+        $ids = $this->getTachesIdBySignatureFromView($valeurs) ;
 
         $qb = $this->createQueryBuilder('t')
             ->orderBy('t.creationdate', 'DESC')
-            ->setParameter('signature', $valeurs) ;
+            ->setParameter('ids', $ids) ;
 
-        if (is_array($valeurs)) {
-            $qb->andWhere('t.signature in (:signature)') ;
-        } else {
-            $qb->andWhere('t.signature = :signature') ;
-        }
+        $qb->andWhere('t.id in (:ids)') ;
 
         $query = $qb->getQuery() ;
         $results = $query->getResult();
 
-        $toFind = is_array($valeurs) ? array_flip(array_values($valeurs)) : [$valeurs => $valeurs] ;
-
-        $return = [] ;
-        foreach ($results as $r) {
-            if (sizeof($toFind) == 0) {
-                break ;
-            }
-            if (isset($toFind[$r->getSignature()])) {
-                unset($toFind[$r->getSignature()]) ;
-                $return[] = $r ;
-            }
-        }
-
-        return $return ;
+        return $results ;
     }
 
     public function findLast(): Tache|null
