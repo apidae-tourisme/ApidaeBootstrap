@@ -131,8 +131,7 @@ function tacheStart(id) {
     ajax.done(function (data) {
 
         jQuery('[data-tacheid="' + id + '"] .result').html('');
-        console.log('tacheStart.done', data);
-        if (typeof data.startdate.date !== 'undefined' && data.startdate.date != null) {
+        if (data.startdate != null && typeof data.startdate.date !== 'undefined' && data.startdate.date != null) {
             let d = new Date(data.startdate.date);
             jQuery('[data-tacheid="' + id + '"] .startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
         }
