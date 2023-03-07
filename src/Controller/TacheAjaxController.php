@@ -2,17 +2,18 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Controller ;
 
-use ApidaeTourisme\ApidaeBundle\Entity\Tache;
-use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
-use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 use Symfony\Component\Process\Process;
+use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 #[Route('/apidaebundle/taches', name: 'apidaebundle_taches_')]
@@ -22,7 +23,7 @@ class TacheAjaxController extends AbstractController
     public function start(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository): JsonResponse
     {
         $tache = $tacheRepository->findOneBy(['id' => $id]);
-        $tachesServices->startByProcess($tache, $request->get('force') == true);
+        $tachesServices->restart($tache) ;
         return new JsonResponse([
             'id' => (int)$tache->getId(),
             //'pid' => $tache->getPid(),

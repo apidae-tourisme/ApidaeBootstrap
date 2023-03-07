@@ -66,7 +66,7 @@ class TachesManagerCommand extends Command
                 $next = $this->tacheRepository->getTacheToRun();
 
                 if ($next) {
-                    $this->tachesLogger->info('Une tâche en attente va être exécutée : tachesServices->startByProcess($tache)', [
+                    $this->tachesLogger->info('Une tâche en attente va être exécutée', [
                         'command' => self::getDefaultName(),
                         'id' => $next->getId(),
                         'tache' => $next->getMethod()

@@ -111,11 +111,11 @@ class TachesServices
                 return false;
             }
 
-                        if (!in_array($params['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
-                            $this->tachesLogger->error(__METHOD__ . ': Type de fichier non autorisé');
-                            return false;
-                        }
-                        $originalFilename = pathinfo($params['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
+            if (!in_array($params['fichier']->guessExtension(), self::FICHIERS_EXTENSIONS)) {
+                $this->tachesLogger->error(__METHOD__ . ': Type de fichier non autorisé');
+                return false;
+            }
+            $originalFilename = pathinfo($params['fichier']->getClientOriginalName(), PATHINFO_FILENAME);
             $filename = $this->slugger->slug($originalFilename) .  '.' . $params['fichier']->guessExtension();
 
             try {
@@ -133,6 +133,13 @@ class TachesServices
         }
 
         return $id;
+    }
+
+    public function restart($tache)
+    {
+        $tache->setStatus(TachesStatus::TO_RUN);
+        //$tache->setCreationdate(new \DateTime());
+        $this->save($tache) ;
     }
 
     /**
