@@ -115,6 +115,15 @@ class TacheRepository extends ServiceEntityRepository
         return $results ;
     }
 
+    public function findBySignature(string $signature): Tache|null
+    {
+        $ids = $this->getTachesIdBySignatureFromView([$signature]) ;
+        if (sizeof($ids) == 1) {
+            return $this->findOneBy(['id' => $ids[0]]) ;
+        }
+        return null ;
+    }
+
     public function findLast(): Tache|null
     {
         return $this->createQueryBuilder('t')
