@@ -53,7 +53,7 @@ function tacheRunningWatchStatus(id) {
 
     ajax.done(function (data) {
         status.html(data);
-        if (status.find('.badge.status').text() == 'RUNNING')
+        if (['TO_RUN', 'RUNNING'].includes(status.find('.badge.status').text()))
             setTimeout(function () { tacheRunningWatchStatus(id) }, frequence);
         else
             tacheRefresh(id);
