@@ -5,7 +5,9 @@
  */
 var tachesPool = [];
 var tachesFails = [];
+var tachesWatched = [];
 var frequence = 5000;
+var tacheDebug = false;
 
 var apidaebundle_taches_path = 'apidaebundle/taches';
 
@@ -30,9 +32,20 @@ var tachesDateOpt = {
  * 
  * @param {*} id 
  */
+
+function startTacheRunningWatchStatus(id) {
+    if (tachesWatched.includes(id)) return false;
+    tacheRunningWatchStatus(id);
+}
+
 function tacheRunningWatchStatus(id) {
+
+    if (tacheDebug) console.log('tacheRunningWatchStatus', id);
+
     var status = jQuery('[data-tacheid="' + id + '"] .status:not(.badge)');
     if (status.length == 0) return;
+
+    tachesWatched.push(id);
 
     var ajax = jQuery.get({
         url: apidaebundle_taches_path + "/status/" + id
@@ -126,7 +139,7 @@ function tacheStart(id) {
 
         jQuery('[data-tacheid="' + id + '"] .enddate').html('');
         if (typeof data === 'object' && typeof data.id === 'number') {
-            setTimeout(function () { tacheRunningWatchStatus(id) }, frequence);
+            setTimeout(function () { startTacheRunningWatchStatus(id) }, frequence);
         }
     });
 }
@@ -227,6 +240,8 @@ function fillTache(tache, data) {
     if (data.dateend != null) {
 
     }
+
+    if (data.status == 'RUNNING') startTacheRunningWatchStatus(data.id);
 }
 
 
@@ -241,7 +256,7 @@ jQuery(document).ready(function () {
      */
     jQuery("[data-tacheid] .status").each(function () {
         if (jQuery(this).text() == 'RUNNING')
-            tacheRunningWatchStatus(tacheId(jQuery(this)));
+            startTacheRunningWatchStatus(tacheId(jQuery(this)));
     });
 
     getTachesToMonitor();
@@ -249,7 +264,7 @@ jQuery(document).ready(function () {
 
 jQuery(document).on('click', '[data-tacheid] a.refresh, a[data-tacheid].refresh', function (e) {
     e.preventDefault();
-    tacheRunningWatchStatus(tacheId(jQuery(this))); // Sert à rafraichir le STATUS
+    startTacheRunningWatchStatus(tacheId(jQuery(this))); // Sert à rafraichir le STATUS
     tacheRefresh(tacheId(jQuery(this)));
 });
 
@@ -273,6 +288,7 @@ jQuery(document).on('click', '[data-tacheid] a.start, a[data-tacheid].start', fu
         if (!confirm('Forcer la relance de la tâche ?')) return false;
     }
     tacheStart(tacheId(jQuery(this)));
+    jQuery(this).replaceWith('<i class="fas fa-spinner"></i>');
 });
 
 // Bouton "paramètre"

@@ -22,10 +22,10 @@ class TacheAjaxController extends AbstractController
     public function start(string $id, Request $request, TachesServices $tachesServices, TacheRepository $tacheRepository): JsonResponse
     {
         $tache = $tacheRepository->findOneBy(['id' => $id]);
-        $pid = $tachesServices->startByProcess($tache, $request->get('force') == true);
+        $tachesServices->startByProcess($tache, $request->get('force') == true);
         return new JsonResponse([
             'id' => (int)$tache->getId(),
-            'pid' => $pid,
+            //'pid' => $tache->getPid(),
             'startdate' => $tache->getStartDate()
         ]);
     }

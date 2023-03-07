@@ -139,7 +139,7 @@ class TachesServices
      * Lance une tâche en process (tâche de fond)
      * Une fois lancée, la tâche renseigne le pid du process en base
      */
-    public function startByProcess(Tache $tache, bool $force = false)
+    public function startByProcess(Tache $tache, bool $force = false): void
     {
         if (!$force && $tache->getStatus() != TachesStatus::TO_RUN->value) {
             throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
@@ -163,17 +163,9 @@ class TachesServices
         $process = Process::fromShellCommandline($cl);
         $process->start();
 
-        /**
-         * En réalité ça ne sert quasiment à rien puisque le pid de création 222 ne reste pas, il sera remplacé par un fork (222 => 223)
-         * C'est pour ça qu'on a ici une méthode Taches::getPid() qui va rechercher le pid d'une tâche directement dans ps -ef
-         */
-        $pid = $process->getPid();
-        $tache->setPid($pid);
         $tache->setEndDate(null);
         $tache->setProgress(null);
         $this->save($tache);
-
-        return $pid;
     }
 
     /**
@@ -192,7 +184,7 @@ class TachesServices
             TachesStatus::RUNNING
         ];
 
-        $realPid = $this->getPid($tache->getId());
+        $realPid = $this->getPidFromPS($tache->getId());
         if (!$realPid) {
             $response['error'] = 'La tâche ne semble pas être en cours d\'éxécution';
             return $response;
@@ -308,13 +300,13 @@ class TachesServices
      */
     public function running(int $tacheId)
     {
-        return $this->getPid($tacheId) !== false;
+        return $this->getPidFromPS($tacheId) !== false;
     }
 
     /**
      * Renvoie le pid réel de la tâche en cours
      */
-    public static function getPid(int $tacheId)
+    public static function getPidFromPS(int $tacheId)
     {
         $process = Process::fromShellCommandline('pgrep -f \'[b]in/console '.TacheCommand::getDefaultName().' ' . $tacheId . '\'');
         $process->run();
@@ -350,7 +342,7 @@ class TachesServices
     {
         foreach ($taches as $tache) {
             if ($tache->getStatus() == TachesStatus::RUNNING) {
-                $pid = self::getPid($tache->getId());
+                $pid = self::getPidFromPS($tache->getId());
                 $tache->setPid($pid);
                 if ($pid !== false) {
                     $tache->setRealStatus(TachesStatus::RUNNING);

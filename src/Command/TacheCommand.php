@@ -62,6 +62,7 @@ class TacheCommand extends Command
         $tache->setResult([]);
         $tache->setEndDate(null);
         $tache->setProgress(null);
+        $tache->setPid(getmypid()) ;
         $this->tachesServices->save($tache) ;
 
         $commandState = Command::FAILURE;
