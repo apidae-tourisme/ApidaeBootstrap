@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block main %}
+
+<a href="{{ path('apidaebundle_taches_manager',{action:'cancelRunningTasks'}) }}" class="btn btn-danger">Annuler les tâches en cours et à lancer</a>
+
 {% include 'taches/table.html.twig' %}
 {% endblock %}

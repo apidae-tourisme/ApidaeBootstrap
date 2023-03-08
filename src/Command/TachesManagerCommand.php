@@ -60,7 +60,7 @@ class TachesManagerCommand extends Command
             $this->tachesServices->monitorRunningTasks() ;
             $running = $this->tacheRepository->getTachesNumberByStatus('RUNNING') ;
 
-            if ($running > $this->APIDAEBUNDLE_TACHES_MAX) {
+            if ($running >= $this->APIDAEBUNDLE_TACHES_MAX) {
                 $this->tachesLogger->debug($running . '/'.$this->APIDAEBUNDLE_TACHES_MAX.' tâches sont déjà en cours : aucune autre tâche ne sera lancée') ;
             } else {
                 $next = $this->tacheRepository->getTacheToRun();

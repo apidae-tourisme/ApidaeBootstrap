@@ -135,7 +135,7 @@ class TachesServices
         return $id;
     }
 
-    public function restart($tache)
+    public function restart(Tache $tache)
     {
         $tache->setStatus(TachesStatus::TO_RUN);
         //$tache->setCreationdate(new \DateTime());

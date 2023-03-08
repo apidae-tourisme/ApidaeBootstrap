@@ -2,6 +2,7 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Controller ;
 
+use ApidaeTourisme\ApidaeBundle\Config\TachesStatus;
 use Symfony\Component\Process\Process;
 use ApidaeTourisme\ApidaeBundle\Entity\Tache;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,7 @@ class TacheController extends AbstractController
          */
         $user = $this->getUser();
         $taches = $this->tacheRepository->findBy(['userEmail' => $user->getEmail()]);
-        $taches = $this->tachesServices->setRealStatus($taches);
+        //$taches = $this->tachesServices->setRealStatus($taches);
 
         $alerts = [];
         if (!is_writable($this->kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {
@@ -47,12 +48,24 @@ class TacheController extends AbstractController
     }
 
     #[Route('/manager', name: 'manager')]
-    public function manager()
+    public function manager(Request $request)
     {
         $this->tachesServices->monitorRunningTasks();
 
         $taches = $this->tacheRepository->findAll();
-        $taches = $this->tachesServices->setRealStatus($taches);
+        //$taches = $this->tachesServices->setRealStatus($taches);
+
+        if ($request->get('action') == 'cancelRunningTasks') {
+            foreach ($taches as $t) {
+                if ($t->getStatus() == TachesStatus::RUNNING->value) {
+                    $this->tachesServices->stop($t) ;
+                } elseif ($t->getStatus() == TachesStatus::TO_RUN->value) {
+                    $t->setStatus(TachesStatus::CANCELLED) ;
+                    dump($t->getStatus()) ;
+                    $this->tachesServices->save($t) ;
+                }
+            }
+        }
 
         $alerts = [];
         if (!is_writable($this->kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {

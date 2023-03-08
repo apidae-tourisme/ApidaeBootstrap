@@ -27,7 +27,7 @@
             </div>
             {% endif %}
         {% endif %}
-    {% elseif tache.status == 'INTERRUPTED' %}
+    {% elseif tache.status == 'INTERRUPTED' or tache.status == 'CANCELLED' %}
         <span class="badge bg-dark status"><i class="fas fa-stop-circle"></i> {{ tache.status }}</span>
         <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id,'force':1}) }}"><i class="fas fa-play"></i></a>
     {% elseif tache.status == 'COMPLETED' %}
