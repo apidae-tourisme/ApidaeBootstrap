@@ -2,6 +2,7 @@
 
 namespace ApidaeTourisme\ApidaeBundle\Command;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 use Doctrine\ORM\EntityManagerInterface;
@@ -77,7 +78,11 @@ class TachesManagerCommand extends Command
                         'id' => $next->getId(),
                         'tache' => $next->getMethod()
                     ]) ;
-                    $childs[] = $this->tachesServices->startByProcess($next) ;
+                    try {
+                        $childs[] = $this->tachesServices->startByProcess($next) ;
+                    } catch (Exception $e) {
+                        $this->tachesLogger->error($e->getMessage()) ;
+                    }
                 } else {
                     $this->tachesLogger->debug('Aucune tâche en attente n\'a été trouvée') ;
                 }
