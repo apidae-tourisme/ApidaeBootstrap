@@ -1,9 +1,9 @@
 {% if tache is defined and tache is not null %}
     {% if tache.status == 'TO_RUN' %}
-        <span class="badge bg-primary status" data-status="{{ tache.status }}">En attente</span>
+        <span class="badge bg-primary" data-status="{{ tache.status }}">En attente</span>
         {# <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id}) }}"><i class="fas fa-play"></i></a> #}
     {% elseif tache.status == 'RUNNING' %}
-        <span class="badge bg-warning status" data-status="{{ tache.status }}">En cours</span>
+        <span class="badge bg-warning" data-status="{{ tache.status }}">En cours</span>
         {# <a class="stop" href="{{ path('apidaebundle_taches_stop',{'id':tache.id}) }}"><i class="fas fa-skull"></i></a> #}
         {% if tache.progress is not null %}
             {% set width = 0 %}
@@ -17,15 +17,15 @@
             {% endif %}
         {% endif %}
     {% elseif tache.status == 'INTERRUPTED' or tache.status == 'CANCELLED' %}
-        <span class="badge bg-dark status" data-status="{{ tache.status }}"><i class="fas fa-stop-circle"></i> Interrompu</span>
+        <span class="badge bg-dark" data-status="{{ tache.status }}"><i class="fas fa-stop-circle"></i> Interrompu</span>
         <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id,'force':1}) }}"><i class="fas fa-play"></i></a>
     {% elseif tache.status == 'COMPLETED' %}
-        <span class="badge bg-success status" data-status="{{ tache.status }}"><i class="fas fa-check"></i> Terminé</span>
+        <span class="badge bg-success" data-status="{{ tache.status }}"><i class="fas fa-check"></i> Terminé</span>
         {% if app_env is defined and app_env == 'dev' %}
             <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id,'force':1}) }}"><i class="fas fa-play"></i></a>
         {% endif %}
     {% elseif tache.status == 'FAILED' %}
-        <span class="badge bg-danger status" data-status="{{ tache.status }}"><i class="fas fa-exclamation-triangle"></i> En erreur</span>
+        <span class="badge bg-danger" data-status="{{ tache.status }}"><i class="fas fa-exclamation-triangle"></i> En erreur</span>
         <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id,'force':1}) }}"><i class="fas fa-play"></i></a>
     {% else %}
         {{ tache.status }}

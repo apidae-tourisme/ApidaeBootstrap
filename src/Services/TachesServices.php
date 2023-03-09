@@ -149,7 +149,9 @@ class TachesServices
     public function startByProcess(Tache $tache, bool $force = false): Process
     {
         if (!$force && $tache->getStatus() != TachesStatus::TO_RUN->value) {
-            throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
+            //throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
+            $this->tachesLogger->error('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
+            return false ;
         }
 
         $path = $this->kernel->getProjectDir() . '/bin/console';
@@ -348,5 +350,6 @@ class TachesServices
     {
         $this->em->persist($tache);
         $this->em->flush();
+        $this->em->refresh($tache) ;
     }
 }

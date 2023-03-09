@@ -42,7 +42,7 @@ function tacheStart(id) {
             tache.find('.startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
         }
         tache.find('.enddate').html('');
-        tache.find('.status').html('TO_RUN'); // L'ajout du statut TO_RUN doit suffire à faire rentrer la tâche dans le monitorVisibleTasks
+        tache.find('.status .badge').data('status', 'TO_RUN').removeClass('bg-warning').addClass('bg-primary').html('TO_RUN'); // L'ajout du statut TO_RUN doit suffire à faire rentrer la tâche dans le monitorVisibleTasks
     });
 }
 
@@ -108,7 +108,7 @@ function fillTache(tache, data) {
         }
     }
 
-    tache.find('.badge.status').fadeOut(200).fadeIn(200);
+    tache.find('.status .badge').fadeOut(200).fadeIn(200);
 }
 
 
@@ -168,7 +168,7 @@ function generateTachesToMonitorFromSignature() {
  */
 var monitorVisibleTasks_running = false;
 function monitorVisibleTasks() {
-    var taches = jQuery('[data-tacheid] .badge.status[data-status="RUNNING"], [data-tacheid] .badge.status[data-status="TO_RUN"]');
+    var taches = jQuery('[data-tacheid] .status .badge[data-status="RUNNING"], [data-tacheid] .status .badge[data-status="TO_RUN"]');
     if (tacheDebug) console.log('monitorVisibleTasks', taches.length, monitorVisibleTasks_running);
     if (taches.length > 0 && !monitorVisibleTasks_running) {
         if (taches.length > monitorMax) {

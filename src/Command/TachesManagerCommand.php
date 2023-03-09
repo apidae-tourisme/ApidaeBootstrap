@@ -90,8 +90,10 @@ class TachesManagerCommand extends Command
         if (sizeof($childs) > 0) {
             $this->tachesLogger->debug('Cycle terminé... en attente de retour des process enfants') ;
             foreach ($childs as $process) {
-                $process->wait(function ($type, $buffer) {
-                });
+                if ($process) {
+                    $process->wait(function ($type, $buffer) {
+                    });
+                }
             }
             $this->tachesLogger->debug('Tous les process enfants ont été terminés') ;
         }
