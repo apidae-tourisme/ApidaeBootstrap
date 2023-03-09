@@ -23,31 +23,34 @@ class TacheRepository extends ServiceEntityRepository
 
     public function getTachesByUtilisateuId(int $id): array|null
     {
-        return $this->createQueryBuilder('t')
+        $ret = $this->createQueryBuilder('t')
             ->andWhere('t.userEmail = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getResult();
+        return $this->refreshRet($ret) ;
     }
 
     public function getTacheById(int $id): Tache|null
     {
-        return $this->createQueryBuilder('t')
+        $ret = $this->createQueryBuilder('t')
             ->andWhere('t.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
+        return $this->refreshRet($ret) ;
     }
 
     public function getTacheToRun(): Tache|null
     {
-        return $this->createQueryBuilder('t')
+        $ret = $this->createQueryBuilder('t')
             ->andWhere('t.status = :status')
             ->setParameter('status', TachesStatus::TO_RUN)
             ->orderBy('t.creationdate', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+        return $this->refreshRet($ret) ;
     }
 
     public function getTachesToRun(): array|null
@@ -63,20 +66,18 @@ class TacheRepository extends ServiceEntityRepository
             ->orderBy('t.creationdate', 'ASC')
             ->getQuery()
             ->getResult();
-        foreach ($ret as $r) {
-            $this->getEntityManager()->refresh($r) ;
-        }
-        return $ret ;
+        return $this->refreshRet($ret) ;
     }
 
     public function getTachesNumberByStatus(string $status): int|null
     {
-        return $this->createQueryBuilder('t')
+        $ret = $this->createQueryBuilder('t')
             ->select('count(t.id)')
             ->andWhere('t.status = :status')
             ->setParameter('status', $status)
             ->getQuery()
             ->getSingleScalarResult();
+        return $this->refreshRet($ret) ;
     }
 
     public function getTacheBySignature(string $signature): Tache|null
@@ -130,10 +131,26 @@ class TacheRepository extends ServiceEntityRepository
 
     public function findLast(): Tache|null
     {
-        return $this->createQueryBuilder('t')
+        $ret = $this->createQueryBuilder('t')
             ->orderBy('t.creationdate', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+        return $this->refreshRet($ret) ;
+    }
+
+    private function refreshRet($ret)
+    {
+        if ($ret == null) {
+            return $ret ;
+        }
+        if (is_array($ret)) {
+            foreach ($ret as $r) {
+                $this->getEntityManager()->refresh($r) ;
+            }
+        } else {
+            $this->getEntityManager()->refresh($ret) ;
+        }
+        return $ret ;
     }
 }
