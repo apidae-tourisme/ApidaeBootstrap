@@ -1,7 +1,7 @@
 
 
 var frequence = 5000;
-var tacheDebug = false;
+var tacheDebug = true;
 var monitorMax = 200;
 
 var apidaebundle_taches_path = '/apidaebundle/taches';
