@@ -42,7 +42,7 @@ function tacheStart(id) {
             tache.find('.startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
         }
         tache.find('.enddate').html('');
-        tache.find('.status .badge').data('status', 'TO_RUN').removeClass('bg-warning bg-danger bg-dark').addClass('bg-primary').html('En attente'); // L'ajout du statut TO_RUN doit suffire à faire rentrer la tâche dans le monitorVisibleTasks
+        tache.find('.status .badge').attr('data-status', 'TO_RUN').removeClass('bg-warning bg-danger bg-dark').addClass('bg-primary').html('En attente'); // L'ajout du statut TO_RUN doit suffire à faire rentrer la tâche dans le monitorVisibleTasks
     });
 }
 
