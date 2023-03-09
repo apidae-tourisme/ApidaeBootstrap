@@ -89,9 +89,9 @@ class TacheAjaxController extends AbstractController
         } elseif ($id !== null) {
             $taches = $tacheRepository->findBy(['id' => $id]) ;
         } elseif ($signatures !== null) {
-            $taches = $tacheRepository->findLastBySignature($signatures) ;
+            $taches = $tacheRepository->findBySignatures($signatures) ;
         } elseif ($signature !== null) {
-            $taches = $tacheRepository->findLastBySignature($signature) ;
+            $taches = $tacheRepository->findBySignatures([$signature]) ;
         }
 
         if (sizeof($taches) == 0) {
