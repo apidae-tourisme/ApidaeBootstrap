@@ -77,7 +77,7 @@ class TacheRepository extends ServiceEntityRepository
             ->setParameter('status', $status)
             ->getQuery()
             ->getSingleScalarResult();
-        return $this->refreshRet($ret) ;
+            return $ret ;
     }
 
     public function getTacheBySignature(string $signature): Tache|null
