@@ -3,13 +3,14 @@
 namespace ApidaeTourisme\ApidaeBundle\Command;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Process\Process;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
-use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ApidaeTourisme\ApidaeBundle\Services\TachesServices;
 use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 
 /**
@@ -56,6 +57,11 @@ class TachesManagerCommand extends Command
     {
         $this->tachesLogger->debug('Starting '.self::getDefaultName()) ;
 
+        /**
+         * @var array<Process> $childs
+         */
+        $childs = [] ;
+
         for ($i = 1 ; $i <= $this->APIDAEBUNDLE_TACHES_LOOP ; $i++) {
             $this->tachesServices->monitorRunningTasks() ;
             $running = $this->tacheRepository->getTachesNumberByStatus('RUNNING') ;
@@ -71,7 +77,7 @@ class TachesManagerCommand extends Command
                         'id' => $next->getId(),
                         'tache' => $next->getMethod()
                     ]) ;
-                    $this->tachesServices->startByProcess($next) ;
+                    $childs[] = $this->tachesServices->startByProcess($next) ;
                 } else {
                     $this->tachesLogger->debug('Aucune tâche en attente n\'a été trouvée') ;
                 }
@@ -80,6 +86,16 @@ class TachesManagerCommand extends Command
                 sleep($this->APIDAEBUNDLE_TACHES_SLEEP) ;
             }
         }
+
+        if (sizeof($childs) > 0) {
+            $this->tachesLogger->debug('Cycle terminé... en attente de retour des process enfants') ;
+            foreach ($childs as $process) {
+                $process->wait(function ($type, $buffer) {
+                });
+            }
+            $this->tachesLogger->debug('Tous les process enfants ont été terminés') ;
+        }
+
         return Command::SUCCESS;
     }
 }

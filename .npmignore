@@ -1,0 +1,15 @@
+bin/
+config/
+migrations/
+public/
+resources/
+scss/
+src/
+src_dev/
+templates/demo/
+tests/
+.env*
+symfony*
+*.md
+php*
+composer*

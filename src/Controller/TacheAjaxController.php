@@ -67,8 +67,16 @@ class TacheAjaxController extends AbstractController
         return new JsonResponse(['temp' => 'temp']) ;
     }
 
+    /**
+     * Renvoie une représentation json des offres récupérées en bdd
+     *
+     * @param Request $request
+     * @param TacheRepository $tacheRepository
+     * @param TachesServices $tachesServices
+     * @return void
+     */
     #[Route('/statusBy', name: 'statusBy')]
-    public function statusByIds(Request $request, TacheRepository $tacheRepository, TachesServices $tachesServices)
+    public function statusBy(Request $request, TacheRepository $tacheRepository, TachesServices $tachesServices)
     {
         $id = (is_int((int)$request->get('id'))) ? $request->get('id') : null ;
         $ids = (is_array($request->get('ids'))) ? $request->get('ids') : null ;
@@ -77,9 +85,9 @@ class TacheAjaxController extends AbstractController
 
         $taches = [] ;
         if ($ids !== null) {
-            $taches = $tacheRepository->findBy('id', $ids) ;
+            $taches = $tacheRepository->findBy(['id' => $ids]) ;
         } elseif ($id !== null) {
-            $taches = $tacheRepository->findBy('id', $id) ;
+            $taches = $tacheRepository->findBy(['id' => $id]) ;
         } elseif ($signatures !== null) {
             $taches = $tacheRepository->findLastBySignature($signatures) ;
         } elseif ($signature !== null) {
@@ -94,9 +102,9 @@ class TacheAjaxController extends AbstractController
          * @var User $user
          */
         $user = $this->getUser();
-        $response = [] ;
+        $response = ['taches' => []] ;
         foreach ($taches as $tache) {
-            $tachesServices->setRealStatus([$tache]);
+            $tachesServices->monitorTask($tache);
             $tache = $tacheRepository->getTacheById($tache->getId()); // refresh
             $tmp = $tache->get() ;
             if ($tache->getUserEmail() != $user->getEmail()) {
@@ -105,7 +113,13 @@ class TacheAjaxController extends AbstractController
 
             $tmp['status_html'] = $this->render('taches/status.html.twig', ['tache' => $tache])->getContent() ;
 
-            $response[] = $tmp ;
+            if (sizeof($tache->getResult()) > 0) {
+                $tmp['result_html'] = $this->render('taches/result.html.twig', ['logs' => $tache->getLogs()])->getContent() ;
+            } else {
+                $tmp['result_html'] = null ;
+            }
+
+            $response['taches'][] = $tmp ;
         }
 
         return new JsonResponse($response);

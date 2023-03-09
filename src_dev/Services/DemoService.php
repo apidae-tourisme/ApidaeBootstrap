@@ -47,16 +47,18 @@ class DemoService
     */
     public function demo2(Tache $tache): TachesCode
     {
-        $steps = 99 ;
+        $steps = 10 ;
         $logger_context = ['id' => $tache->getId(), 'steps' => $steps] ;
+        $logger_context['tachePid'] = $tache->getPid() ;
         $step = 1 ;
         do {
+            $logger_context['getmypid'] = getmypid() ;
             $logger_context['step'] = $step ;
             $this->tachesLogger->info('Début de l\'étape...', $logger_context) ;
-            $tache->log('info', 'Début de l\'étape '.$step.'...');
+            $tache->log('info', 'Début de l\'étape '.$step.'...'.json_encode($logger_context));
             $this->tachesServices->save($tache) ;
             // Do whatever this task has to do
-            sleep(5) ;
+            sleep(2) ;
             $step++ ;
 
             $this->tachesLogger->info('Fin de l\'étape...', $logger_context) ;

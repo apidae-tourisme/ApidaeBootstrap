@@ -146,7 +146,7 @@ class TachesServices
      * Lance une tâche en process (tâche de fond)
      * Une fois lancée, la tâche renseigne le pid du process en base
      */
-    public function startByProcess(Tache $tache, bool $force = false): void
+    public function startByProcess(Tache $tache, bool $force = false): Process
     {
         if (!$force && $tache->getStatus() != TachesStatus::TO_RUN->value) {
             throw new \Exception('La tâche ' . $tache->getId() . ' n\'est pas en état TO_RUN (' . $tache->getStatus() . ')');
@@ -154,25 +154,25 @@ class TachesServices
 
         $path = $this->kernel->getProjectDir() . '/bin/console';
 
-        $cl = $path . ' '.TacheCommand::getDefaultName().' ' . $tache->getId();
-        $this->tachesLogger->info(__METHOD__ . ' => new Process ' . $cl);
+        $cl = [$path, TacheCommand::getDefaultName(), $tache->getId()];
 
 
         /**
          * @see https://symfony.com/doc/current/components/process.html
-         * $process = new Process([$path, $tache->getMethod()]);
-         * $process = new Process($cl);
-         * $process->start();
         */
+        // $process = new Process($cl);
+        // $process->start();
         /**
          * @see https://stackoverflow.com/a/58765200/2846837
          */
-        $process = Process::fromShellCommandline($cl);
+        $process = Process::fromShellCommandline(implode(' ', $cl));
         $process->start();
 
         $tache->setEndDate(null);
         $tache->setProgress(null);
         $this->save($tache);
+
+        return $process ;
     }
 
     /**
@@ -188,32 +188,44 @@ class TachesServices
         $response = [];
 
         $killable_status = [
-            TachesStatus::RUNNING
+            TachesStatus::RUNNING->value
         ];
 
-        $realPid = $this->getPidFromPS($tache->getId());
-        if (!$realPid) {
-            $response['error'] = 'La tâche ne semble pas être en cours d\'éxécution';
-            return $response;
+        if (!$this->running($tache)) {
+            return ['error' => 'La tâche ne semble pas être en cours d\'éxécution'];
         }
 
-        if (in_array($tache->getStatus(), $killable_status)) {
-            try {
-                $process = new Process(['kill', '-9', $realPid]);
-                $process->run();
-                if ($process->getErrorOutput() == "" && $process->getExitCode() == 0) {
-                    $response['result'] = 'ok';
-                } else {
-                    $response['error'] = $process->getErrorOutput();
-                }
-            } catch (\Exception $e) {
-                $response = ['error' => 'kill -9 failed'];
+        if (! in_array($tache->getStatus(), $killable_status)) {
+            return ['error' => 'La tâche ' . $tache->getId() . ' n\'est pas en état [' . implode(',', $killable_status) . '] (' . $tache->getStatus() . ')'];
+        }
+
+        $realPid = false ;
+        try {
+            $process = Process::fromShellCommandline('pgrep -f \'[b]in/console '.TacheCommand::getDefaultName().' ' . $tache->getId() . '\'');
+            $process->run();
+            $output = $process->getOutput();
+            preg_match_all('#([0-9]+)#m', $output, $reg) ;
+        } catch (Exception $e) {
+            return ['error' => 'Impossible de récupérer le pid...'.$e->getMessage()];
+        }
+
+        if (! isset($reg[1]) || sizeof($reg[1]) == 0) {
+            return ['error' => 'Impossible de trouver le pid de la tâche '.$tache->getId()] ;
+        }
+
+        $realPid = array_pop($reg[1]) ;
+
+        try {
+            $process = new Process(['kill', '-9', $realPid]);
+            $process->run();
+            if ($process->getErrorOutput() == "" && $process->getExitCode() == 0) {
+                return ['result' => 'ok'];
+            } else {
+                return ['error' => $process->getErrorOutput()];
             }
-        } else {
-            $response['error'] = 'La tâche ' . $tache->getId() . ' n\'est pas en état [' . implode(',', $killable_status) . '] (' . $tache->getStatus() . ')';
+        } catch (\Exception $e) {
+            return ['error' => 'kill -9 failed...' . $e->getMessage()];
         }
-
-        return $response;
     }
 
     /**
@@ -294,8 +306,16 @@ class TachesServices
         // Si non : mettre la tâche à INTERRUPTED : la tâche aurait dû passer à COMPLETED
         $taches = $this->tacheRepository->getTachesByStatus(TachesStatus::RUNNING);
         foreach ($taches as $tache) {
-            $tacheId = $tache->getId();
-            if (!$this->running($tacheId)) {
+            $this->monitorTask($tache) ;
+        }
+    }
+
+    public function monitorTask(Tache $tache): void
+    {
+        if ($tache->getStatus() == TachesStatus::RUNNING->value) {
+            if (! $this->running($tache)) {
+                $tacheId = $tache->getId();
+                $this->tachesLogger->error('monitorTask('.$tacheId.') : task is not running => INTERRUPTED') ;
                 $tache->setStatus(TachesStatus::INTERRUPTED);
                 $this->save($tache);
             }
@@ -305,62 +325,20 @@ class TachesServices
     /**
      * Détermine si une tâche est en cours d'exécution ou non
      */
-    public function running(int $tacheId)
+    private function running(Tache $tache): bool
     {
-        return $this->getPidFromPS($tacheId) !== false;
-    }
-
-    /**
-     * Renvoie le pid réel de la tâche en cours
-     */
-    public static function getPidFromPS(int $tacheId)
-    {
-        $process = Process::fromShellCommandline('pgrep -f \'[b]in/console '.TacheCommand::getDefaultName().' ' . $tacheId . '\'');
+        $process = Process::fromShellCommandline('pgrep -f \'[b]in/console '.TacheCommand::getDefaultName().' ' . $tache->getId() . '\'');
         $process->run();
         $output = $process->getOutput();
-        if (is_numeric($output)) {
-            return (int)$output;
-        }
-        return false;
+        return trim($output) != "" ;
     }
 
-    public function setProgress(int $tacheId, array $progress)
-    {
-        if (is_integer($tacheId)) {
-            $tache = $this->tacheRepository->getTacheById($tacheId);
-        }
-        if (get_class($tache) != Tache::class) {
-            return false;
-        }
-
-        $tache->setProgress($progress);
-        $this->save($tache);
-    }
-
-    public function delete(Tache $tache)
+    public function delete(Tache $tache): bool
     {
         $this->filesystem->remove($this->kernel->getProjectDir() . $this->params->get('apidaebundle.task_folder') . $tache->getId());
         $this->em->remove($tache) ;
         $this->em->flush() ;
         return true;
-    }
-
-    public function setRealStatus(array $taches): array
-    {
-        foreach ($taches as $tache) {
-            if ($tache->getStatus() == TachesStatus::RUNNING) {
-                $pid = self::getPidFromPS($tache->getId());
-                $tache->setPid($pid);
-                if ($pid !== false) {
-                    $tache->setRealStatus(TachesStatus::RUNNING);
-                } else {
-                    $tache->setRealStatus(TachesStatus::INTERRUPTED);
-                }
-            }
-        }
-
-        $this->monitorRunningTasks();
-        return $taches;
     }
 
     /**

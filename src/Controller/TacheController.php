@@ -37,7 +37,6 @@ class TacheController extends AbstractController
          */
         $user = $this->getUser();
         $taches = $this->tacheRepository->findBy(['userEmail' => $user->getEmail()]);
-        //$taches = $this->tachesServices->setRealStatus($taches);
 
         $alerts = [];
         if (!is_writable($this->kernel->getProjectDir() . $this->getParameter('apidaebundle.task_folder'))) {
@@ -50,10 +49,9 @@ class TacheController extends AbstractController
     #[Route('/manager', name: 'manager')]
     public function manager(Request $request)
     {
-        $this->tachesServices->monitorRunningTasks();
+        $this->tachesServices->monitorRunningTasks('manager');
 
         $taches = $this->tacheRepository->findAll();
-        //$taches = $this->tachesServices->setRealStatus($taches);
 
         if ($request->get('action') == 'cancelRunningTasks') {
             foreach ($taches as $t) {
@@ -110,7 +108,7 @@ class TacheController extends AbstractController
                 return new Response('Tache introuvable');
             }
         }
-        $this->tachesServices->setRealStatus([$tache]);
+        $this->tachesServices->monitorTask($tache);
         $tache = $this->tacheRepository->getTacheById($id);
 
         if ($_format == 'json') {
@@ -138,7 +136,7 @@ class TacheController extends AbstractController
         if (!$tache) {
             throw new \Exception('Tache introuvable');
         }
-        $this->tachesServices->setRealStatus([$tache]);
+        $this->tachesServices->monitorTask($tache);
         $tache = $this->tacheRepository->getTacheById($id);
 
         return $this->render(
@@ -158,7 +156,7 @@ class TacheController extends AbstractController
         if (!$tache) {
             throw new \Exception('Tache introuvable');
         }
-        $this->tachesServices->setRealStatus([$tache]);
+        $this->tachesServices->monitorTask($tache);
         $tache = $this->tacheRepository->getTacheById($id);
 
         return $this->render(

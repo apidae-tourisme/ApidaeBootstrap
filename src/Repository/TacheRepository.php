@@ -57,12 +57,16 @@ class TacheRepository extends ServiceEntityRepository
 
     public function getTachesByStatus(TachesStatus $status): array|null
     {
-        return $this->createQueryBuilder('t')
+        $ret = $this->createQueryBuilder('t')
             ->andWhere('t.status = :status')
             ->setParameter('status', $status)
             ->orderBy('t.creationdate', 'ASC')
             ->getQuery()
             ->getResult();
+        foreach ($ret as $r) {
+            $this->getEntityManager()->refresh($r) ;
+        }
+        return $ret ;
     }
 
     public function getTachesNumberByStatus(string $status): int|null

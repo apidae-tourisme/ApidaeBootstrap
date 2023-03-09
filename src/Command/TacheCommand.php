@@ -24,16 +24,13 @@ use ApidaeTourisme\ApidaeBundle\Repository\TacheRepository;
 #[AsCommand(name: 'apidae:tache:run', description: 'Lance une tâche définie par son identifiant')]
 class TacheCommand extends Command
 {
-    protected LoggerInterface $logger;
-
     public function __construct(
-        LoggerInterface $tachesLogger,
+        private LoggerInterface $tachesLogger,
         protected EntityManagerInterface $entityManager,
         protected Filesystem $filesystem,
         protected TacheRepository $tacheRepository,
         protected TachesServices $tachesServices
     ) {
-        $this->logger = $tachesLogger;
         parent::__construct();
     }
 
@@ -47,14 +44,14 @@ class TacheCommand extends Command
         $id = $input->getArgument('id');
         $tache = $this->tacheRepository->getTacheById($id) ;
         $logger_context = ['command' => self::getDefaultName(), 'id' => $id] ;
-        $this->logger->info(self::getDefaultName().' '.$id, $logger_context) ;
+        $this->tachesLogger->info(self::getDefaultName().' '.$id, $logger_context) ;
 
         if (!$tache) {
-            $this->logger->warning('Tâche '.$id.' introuvable...', $logger_context) ;
+            $this->tachesLogger->warning('Tâche '.$id.' introuvable...', $logger_context) ;
             return Command::FAILURE ;
         }
 
-        $this->logger->info('Tâche '.$id.' trouvée : lancement de la tâche', $logger_context) ;
+        $this->tachesLogger->info('Tâche '.$id.' trouvée : lancement de la tâche', $logger_context) ;
 
         // On passe le statut à RUNNING pour que l'interface graphique l'affiche correctement
         $tache->setStatus(TachesStatus::RUNNING);
@@ -75,7 +72,7 @@ class TacheCommand extends Command
             } else {
                 $tache->setStatus(TachesStatus::INTERRUPTED) ;
                 $tache->log('warning', 'La tâche n\'a pas renvoyé un code erreur cohérent (not instanceof TachesCode)') ;
-                $this->logger->warning('La tâche n\'a pas renvoyé un code erreur cohérent (not instanceof TachesCode)') ;
+                $this->tachesLogger->warning('La tâche n\'a pas renvoyé un code erreur cohérent (not instanceof TachesCode)') ;
             }
         } catch (Exception $e) {
             /**
@@ -83,7 +80,7 @@ class TacheCommand extends Command
              * On ne sait pas s'il y a déjà des logs dans $result, on va donc le récupérer.
              * On ajoute ensuite l'erreur dans les logs ($result)
              */
-            $this->logger->error('Sortie de tâche sur une exception... '.$e->getMessage()) ;
+            $this->tachesLogger->error('Sortie de tâche sur une exception... '.$e->getMessage()) ;
             $tache->log('error', 'Sortie de tâche sur une exception... '.$e->getMessage()) ;
             $tache->setStatus(TachesStatus::INTERRUPTED) ;
         }
@@ -110,7 +107,7 @@ class TacheCommand extends Command
         $tache->setEndDate(new \DateTime());
         $this->tachesServices->save($tache);
 
-        $this->logger->info('STATUS:' . $tache->getStatus(), $logger_context);
+        $this->tachesLogger->info('STATUS:' . $tache->getStatus(), $logger_context);
         return $commandState;
     }
 }

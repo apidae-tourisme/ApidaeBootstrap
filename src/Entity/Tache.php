@@ -84,8 +84,6 @@ class Tache
      */
     private $signature;
 
-    private $realStatus;
-
     private LoggerInterface $logger ;
 
 
@@ -238,17 +236,6 @@ class Tache
         return $this;
     }
 
-    public function getRealStatus()
-    {
-        return $this->realStatus;
-    }
-
-    public function setRealStatus($realStatus): self
-    {
-        $this->realStatus = $realStatus;
-        return $this;
-    }
-
     public function getSignature(): ?string
     {
         return $this->signature;
@@ -291,7 +278,6 @@ class Tache
             'enddate' => $this->getEnddate(),
             'creationDate' => $this->getCreationdate(),
             'pid' => $this->getPid(),
-            'realStatus' => $this->getRealStatus(),
             'signature' => $this->getSignature()
         ];
         return $ret;
@@ -299,15 +285,15 @@ class Tache
 
     public function getLogs()
     {
-        $return = ['error' => [], 'warning' => [], 'info' => []];
-        $logs = $this->getResult();
-        foreach ($logs as $log) {
-            if (is_array($log)) {
-                $type = array_shift($log);
-                $return[$type][] = $log;
+        $logs = ['error' => [], 'warning' => [], 'info' => []];
+        $results = $this->getResult();
+        foreach ($results as $result) {
+            if (is_array($result)) {
+                $type = array_shift($result);
+                $logs[$type][] = $result;
             }
         }
-        return $return;
+        return $logs;
     }
 
     public function log(string $type, string $message): void

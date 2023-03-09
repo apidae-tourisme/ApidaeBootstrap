@@ -35,7 +35,9 @@ $tache_id = $tachesServices->add($tache);</pre></code>
         </ul>
     </div>
 
-    <a class="btn btn-primary" href="{{ path('app_taches',{'action' : 'creer_tache', 'param' : 'value'}) }}">Créer une tâche</a>
+    <a class="btn btn-primary"  href="{{ path('app_taches',{'action' : 'creer_taches', 'nb' : 1, 'param' : 'value'}) }}">Créer une tâche</a>
+    <a class="btn btn-warning"  href="{{ path('app_taches',{'action' : 'creer_taches', 'nb' : 10, 'param' : 'value'}) }}">Créer 10 tâches</a>
+    <a class="btn btn-danger"   href="{{ path('app_taches',{'action' : 'creer_taches', 'nb' : 100, 'param' : 'value'}) }}">Créer 100 tâches</a>
     
     {% include 'taches/table.html.twig' %}
 {% endblock %}

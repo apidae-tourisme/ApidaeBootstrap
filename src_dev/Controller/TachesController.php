@@ -21,27 +21,22 @@ class TachesController extends AbstractController
     public function demo(Request $request, TacheRepository $tacheRepository, TachesServices $tachesServices)
     {
         $action = $request->get('action') ;
-        $tache = null ;
+        $nb = (int)$request->get('nb') ;
 
-        if ($action == 'creer_tache') {
-            $parametres = [
-                'var' => 'value1',
-                'var2' => ['a','b','c']
-            ] ;
-
-            $tache = new Tache() ;
-            $tache->setMethod('App\\Services\\DemoService:demo2') ;
-            $tache->setParametres($parametres) ;
-            $tache->setSignature('action1_sur_objetA') ;
-            //$tache->setFichier($data['fichier']) ;
-            //$tache->setParametresCaches'(['tokenSSO' => $user->getApidaeToken()]) ;
-            $tache_id = $tachesServices->add($tache);
+        if ($action == 'creer_taches' && $nb > 1 && $nb <= 100) {
+            for ($i = 1 ; $i < 10 ; $i++) {
+                $tache = new Tache() ;
+                $tache->setMethod('App\\Services\\DemoService:demo2') ;
+                $tache->setParametres([
+                    'num' => $i,
+                    'var2' => ['a','b','c']
+                ]) ;
+                $tache->setSignature('action1_sur_objet'.$i) ;
+                $tachesServices->add($tache);
+            }
         }
 
-        $tache = $tacheRepository->getTacheBySignature('action1_sur_objetA') ;
-        dump($tache) ;
-
         $taches = $tacheRepository->findAll() ;
-        return $this->render('demo/taches.html.twig', ['taches' => $taches, 'tache' => $tache]) ;
+        return $this->render('demo/taches.html.twig', ['taches' => $taches]) ;
     }
 }

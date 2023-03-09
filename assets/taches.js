@@ -7,7 +7,8 @@ var tachesPool = [];
 var tachesFails = [];
 var tachesWatched = [];
 var frequence = 5000;
-var tacheDebug = false;
+var tacheDebug = true;
+var monitorMax = 200;
 
 var apidaebundle_taches_path = '/apidaebundle/taches';
 
@@ -19,87 +20,6 @@ var tachesDateOpt = {
     'year': 'numeric',
     'hour': '2-digit',
     'minutes': '2-digit'
-}
-
-/**
- * Remplit seulement le contenu de .status dans une [data-tacheid=?] contenu complet HTML d'une tâche à partir de son id
- * Ex : <span data-tacheid="1"><strong class="status"></strong></span>
- * Tant que la tâche est en status RUNNING, cette fonction s'auto relance toutes les frequence=5000ms
- * Dès que le status n'est plus RUNNING, lance un dernier tacheRefresh(id) (qui renseignera tout le reste : boutons, pid, fichier...)
- * 
- * Cette action se lance automatiquement au chargement de la page si on a déjà un status=RUNNING
- * <truc data-tacheid=?><machin class="status">RUNNING</machin></truc>
- * 
- * @param {*} id 
- */
-
-function startTacheRunningWatchStatus(id) {
-    if (tachesWatched.includes(id)) return false;
-    tacheRunningWatchStatus(id);
-}
-
-function tacheRunningWatchStatus(id) {
-
-    if (tacheDebug) console.log('tacheRunningWatchStatus', id);
-
-    var status = jQuery('[data-tacheid="' + id + '"] .status:not(.badge)');
-    if (status.length == 0) return;
-
-    tachesWatched.push(id);
-
-    var ajax = jQuery.get({
-        url: apidaebundle_taches_path + "/status/" + id
-    });
-
-    ajax.done(function (data) {
-        status.html(data);
-        if (['TO_RUN', 'RUNNING'].includes(status.find('.badge.status').text()))
-            setTimeout(function () { tacheRunningWatchStatus(id) }, frequence);
-        else
-            tacheRefresh(id);
-    });
-
-    ajax.fail(function (data) {
-        console.log('fail', id, data);
-        if (typeof tachesFails[id] == 'undefined') tachesFails[id] = 0;
-        tachesFails[id]++;
-        if (tachesFails[id] < 10)
-            setTimeout(function () { tacheRunningWatchStatus(id) }, frequence);
-    });
-
-    tachesPool[id] = ajax;
-}
-
-/**
- * Met à jour les infos HTML détaillées d'une tâche.
- * Il faut que chaque info ait son placeholder au sein du container <truc data-tache-id="1">...</truc> :
- * Par exemple il faut un élément avec .status, un .fichier si c'est pertinent...
- * .status (pas mis à jour par tacheRefresh)
- * .fichier si la tâche a généré un fichier à télécharger
- * .startdate
- * .enddate
- * .result contiendra les logs
- * @param {*} id 
- */
-function tacheRefresh(id) {
-
-    var ajax = jQuery.get({
-        'url': apidaebundle_taches_path + '/status/' + id,
-        'data': { '_format': 'json' },
-        'dataType': 'json'
-    });
-
-    ajax.done(function (data) {
-
-        var tache = jQuery('[data-tacheid="' + data.id + '"]');
-        if (tache.length == 0) return;
-        fillTache(tache, data);
-    });
-
-    ajax.fail(function (data) {
-        console.log('tacheRefresh fail', id, data);
-    });
-
 }
 
 
@@ -130,16 +50,14 @@ function tacheStart(id) {
     });
     ajax.done(function (data) {
 
-        jQuery('[data-tacheid="' + id + '"] .result').html('');
+        var tache = jQuery('[data-tacheid="' + id + '"]');
+        tache.find('.result').html('');
         if (data.startdate != null && typeof data.startdate.date !== 'undefined' && data.startdate.date != null) {
             let d = new Date(data.startdate.date);
-            jQuery('[data-tacheid="' + id + '"] .startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
+            tache.find('.startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
         }
-
-        jQuery('[data-tacheid="' + id + '"] .enddate').html('');
-        if (typeof data === 'object' && typeof data.id === 'number') {
-            setTimeout(function () { startTacheRunningWatchStatus(id) }, frequence);
-        }
+        tache.find('.enddate').html('');
+        tache.find('.status').html('TO_RUN'); // L'ajout du statut TO_RUN doit suffire à faire rentrer la tâche dans le monitorVisibleTasks
     });
 }
 
@@ -159,32 +77,92 @@ function tacheStop(id) {
     });
 }
 
-function tacheId(obj) {
+function getTacheId(obj) {
     if (typeof obj.data('tacheid') != 'undefined') return obj.data('tacheid')
     if (obj.closest('[data-tacheid]').length > 0) return obj.closest('[data-tacheid]').data('tacheid');
     return false;
 }
+
+function getTacheById(id) {
+    return jQuery('[data-tacheid="' + id + '"]');
+}
+
+
+/**
+ * Renseigne les champs (html) de la tâche tache, avec les données data récupérées en ajax
+ * @param element tache 
+ * @param array data 
+ */
+function fillTache(tache, data) {
+    if (typeof data.fichier != 'undefined' && data.fichier != null)
+        tache.find('.fichier').html('<small><a href="' + apidaebundle_taches_path + '/download/' + data.id + '">' + data.fichier + '</a></small>');
+    else tache.find('.fichier').html('');
+
+    if (typeof data.result != 'undefined' && tache.find('.result').length > 0) {
+        if (Array.isArray(data.result) && typeof tache.result_html != 'undefined' && data.result.length > 0) {
+            tache.find('.result').html(tache.result_html);
+        } else tache.find('.result').html('');
+    }
+    else tache.find('.result').html('');
+
+    if (typeof data.startdate != 'undefined' && data.startdate != null && tache.find('.startdate').length > 0) {
+        let d = new Date(data.startdate.date);
+        tache.find('.startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
+    }
+    else tache.find('.startdate').html('');
+
+    if (typeof data.enddate != 'undefined' && data.enddate != null && typeof data.enddate.date != undefined && tache.find('.enddate').length > 0) {
+        let d = new Date(data.enddate.date);
+        tache.find('.enddate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
+    }
+    else tache.find('.enddate').html('');
+
+    if (typeof data.status != 'undefined' && data.status != null && tache.find('.status').length > 0) {
+        if (typeof data.status_html != 'undefined') {
+            tache.find('.status').html(data.status_html);
+        }
+    }
+
+    tache.find('.badge.status').fadeOut(200).fadeIn(200);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Le rendu serveur peut ne pas s'être préoccupé de savoir s'il y avait une tâche existante pour une signature donnée.
  * On demande donc au JS de vérifier si le serveur nous a laissé des <truc class="tache" data-signature="?"></truc> dans la source :
  * Si c'est le cas, on va aller chercher les tâches correspondantes à ces signatures, et remplacer ça par des informations pertinentes
  */
-function getTachesToMonitor() {
-    var waiting = jQuery('.tache[data-signature]:not(.notask)');
-    if (typeof waiting !== 'undefined' && waiting.length > 0) {
-        if (waiting.length > 100) {
-            console.log('pas de monitoring, trop de tâches à analyser');
+var generateTachesToMonitorFromSignature_running = false;
+function generateTachesToMonitorFromSignature() {
+    var taches = jQuery('.tache[data-signature]:not(.notask)');
+    if (tacheDebug) console.log('generateTachesToMonitorFromSignature', taches.length, generateTachesToMonitorFromSignature_running);
+    if (typeof taches !== 'undefined' && taches.length > 0 && !generateTachesToMonitorFromSignature_running) {
+        if (taches.length > monitorMax) {
+            console.log('generateTachesToMonitorFromSignature stop : trop de tâches à analyser (' + taches.length + ')');
         } else {
-            var signatures = waiting.map(function () { return jQuery(this).data('signature') }).get();
+            var signatures = taches.map(function () { return jQuery(this).data('signature') }).get();
+            generateTachesToMonitorFromSignature_running = true;
             var ajax = jQuery.post({
                 url: apidaebundle_taches_path + '/statusBy',
                 data: { 'signatures': signatures },
                 dataType: 'json'
             });
+            ajax.always(function () {
+                generateTachesToMonitorFromSignature_running = false;
+            });
             ajax.done(function (results) {
-                Object.entries(results).forEach(([key, result]) => {
-                    let tache = jQuery('<div class="tache" data-tacheid="' + result.id + '"><span class="status">' + result.status_html + '</span></div>');
+                Object.entries(results.taches).forEach(([key, result]) => {
+                    let tache = jQuery('<div class="tache" data-tacheid="' + result.id + '"><span class="status"></span></div>');
                     jQuery('.tache[data-signature="' + result.signature + '"]').replaceWith(tache);
                     fillTache(tache, result);
                 });
@@ -199,85 +177,76 @@ function getTachesToMonitor() {
     }
 }
 
-global.getTachesToMonitor = getTachesToMonitor;
-
 /**
- * Renseigne les champs (html) de la tâche tache, avec les données data récupérées en ajax
- * @param element tache 
- * @param array data 
+ * Cherche les tâches TO_RUN et RUNNING visible à l'instant T sur la page
+ * Vérifie leur statut par une reqûete ajax et le met à jour sur l'interface si nécessaire
  */
-function fillTache(tache, data) {
-    if (typeof data.fichier != 'undefined')
-        tache.find('.fichier').html('<small><a href="' + apidaebundle_taches_path + '/download/' + data.id + '">' + data.fichier + '</a></small>');
-    else tache.find('.fichier').html('');
-
-    if (typeof data.result != 'undefined') {
-        // On affiche le result dans la case...
-        tache.find('.result').html('<pre>' + JSON.stringify(data.result) + '</pre>');
-        // Mais on va le MAJ en ajax histoire d'avoir l'affichage classique généré par le template
-        jQuery.get({
-            'url': apidaebundle_taches_path + '/result/' + data.id
-        }, function (data) {
-            tache.find('.result').html(data);
-        });
+var monitorVisibleTasks_running = false;
+function monitorVisibleTasks() {
+    var taches = jQuery('[data-tacheid] .badge.status[data-status="RUNNING"], [data-tacheid] .badge.status[data-status="TO_RUN"]');
+    if (tacheDebug) console.log('monitorVisibleTasks', taches.length, monitorVisibleTasks_running);
+    if (taches.length > 0 && !monitorVisibleTasks_running) {
+        if (taches.length > monitorMax) {
+            console.log('monitorVisibleTasks : trop de tâches à monitorer (' + taches.length + ')');
+        } else {
+            var ids = taches.map(function () { return jQuery(this).closest('[data-tacheid]').data('tacheid') }).get();
+            monitorVisibleTasks_running = true;
+            var ajax = jQuery.post({
+                url: apidaebundle_taches_path + '/statusBy',
+                data: {
+                    ids: ids
+                },
+                dataType: 'json'
+            });
+            ajax.always(function () {
+                monitorVisibleTasks_running = false;
+            });
+            ajax.fail(function (data) {
+                console.log('fail', data);
+            });
+            ajax.done(function (results) {
+                Object.entries(results.taches).forEach(([key, result]) => {
+                    let tache = getTacheById(result.id);
+                    fillTache(tache, result);
+                });
+            });
+        }
     }
-    else tache.find('.result').html('');
-
-
-    if (typeof data.startdate != 'undefined' && data.startdate != null) {
-        let d = new Date(data.startdate.date);
-        tache.find('.startdate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
-    }
-    else tache.find('.startdate').html('');
-
-    if (typeof data.enddate != 'undefined' && data.enddate != null && typeof data.enddate.date != undefined) {
-        let d = new Date(data.enddate.date);
-        tache.find('.enddate').html(dateformat(d, 'dd/mm/yyyy H:MM:ss'));
-    }
-    else tache.find('.enddate').html('');
-
-    if (data.dateend != null) {
-
-    }
-
-    if (data.status == 'RUNNING') startTacheRunningWatchStatus(data.id);
 }
+
+
+
+
+
+
+
 
 
 
 /**
  * BINDS
  */
-jQuery(document).ready(function () {
-    /**
-     * Au chargement de la page, on cherche tout élément qui possederait un data-tacheid
-     * Pour chacun on vérifie le statut, s'il est running on lance un watch
-     */
-    jQuery("[data-tacheid] .status").each(function () {
-        if (jQuery(this).text() == 'RUNNING')
-            startTacheRunningWatchStatus(tacheId(jQuery(this)));
-    });
 
-    getTachesToMonitor();
-});
-
-jQuery(document).on('click', '[data-tacheid] a.refresh, a[data-tacheid].refresh', function (e) {
-    e.preventDefault();
-    startTacheRunningWatchStatus(tacheId(jQuery(this))); // Sert à rafraichir le STATUS
-    tacheRefresh(tacheId(jQuery(this)));
-});
+/**
+ * Toutes les 5 secondes, on regarde si on a des tâches par signature,
+ * puis on va voir si on a des TO_RUN ou RUNNING en cours pour voir où elles en sont.
+ */
+const interval = setInterval(function () {
+    generateTachesToMonitorFromSignature();
+    monitorVisibleTasks();
+}, frequence);
 
 jQuery(document).on('click', '[data-tacheid] a.stop, a[data-tacheid].stop', function (e) {
     if (!confirm('Stopper la tâche ?')) return false;
     e.preventDefault();
-    tacheStop(tacheId(jQuery(this)));
+    tacheStop(getTacheId(jQuery(this)));
     jQuery(this).remove();
 });
 
 jQuery(document).on('click', '[data-tacheid] a.delete, a[data-tacheid].delete', function (e) {
     if (!confirm('Supprimer la tâche ?')) return false;
     e.preventDefault();
-    tacheDelete(tacheId(jQuery(this)));
+    tacheDelete(getTacheId(jQuery(this)));
     jQuery(this).remove();
 });
 
@@ -286,7 +255,7 @@ jQuery(document).on('click', '[data-tacheid] a.start, a[data-tacheid].start', fu
     if (jQuery(this).attr('href').match(/force/g)) {
         if (!confirm('Forcer la relance de la tâche ?')) return false;
     }
-    tacheStart(tacheId(jQuery(this)));
+    tacheStart(getTacheId(jQuery(this)));
     jQuery(this).replaceWith('<i class="fas fa-spinner"></i>');
 });
 
