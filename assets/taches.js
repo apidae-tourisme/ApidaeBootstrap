@@ -1,27 +1,12 @@
 
-/**
- * Lance la surveillance d'une tâche id
- * @param {L} id 
- */
-var tachesPool = [];
-var tachesFails = [];
-var tachesWatched = [];
+
 var frequence = 5000;
-var tacheDebug = true;
+var tacheDebug = false;
 var monitorMax = 200;
 
 var apidaebundle_taches_path = '/apidaebundle/taches';
 
 import dateformat from 'dateformat';
-
-var tachesDateOpt = {
-    'day': '2-digit',
-    'month': '2-digit',
-    'year': 'numeric',
-    'hour': '2-digit',
-    'minutes': '2-digit'
-}
-
 
 function tacheDelete(id) {
     var ajax = jQuery.ajax({
@@ -148,7 +133,7 @@ function generateTachesToMonitorFromSignature() {
     if (tacheDebug) console.log('generateTachesToMonitorFromSignature', taches.length, generateTachesToMonitorFromSignature_running);
     if (typeof taches !== 'undefined' && taches.length > 0 && !generateTachesToMonitorFromSignature_running) {
         if (taches.length > monitorMax) {
-            console.log('generateTachesToMonitorFromSignature stop : trop de tâches à analyser (' + taches.length + ')');
+            if (tacheDebug) console.log('generateTachesToMonitorFromSignature stop : trop de tâches à analyser (' + taches.length + ')');
         } else {
             var signatures = taches.map(function () { return jQuery(this).data('signature') }).get();
             generateTachesToMonitorFromSignature_running = true;
