@@ -67,7 +67,7 @@ class TachesServices
             $user = $this->security->getUser();
             $tache->setUserEmail($user->getEmail());
         } else {
-            $tache->setUserEmail($params['utilisateurEmail']);
+            $tache->setUserEmail($params['userEmail']);
         }
 
         if (isset($params['method'])) {

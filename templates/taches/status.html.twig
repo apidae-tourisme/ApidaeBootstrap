@@ -16,7 +16,10 @@
             </div>
             {% endif %}
         {% endif %}
-    {% elseif tache.status == 'INTERRUPTED' or tache.status == 'CANCELLED' %}
+    {% elseif tache.status == 'CANCELLED' %}
+        <span class="badge bg-dark" data-status="{{ tache.status }}"><i class="fas fa-stop-circle"></i> Annulé</span>
+        <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id,'force':1}) }}"><i class="fas fa-play"></i></a>
+    {% elseif tache.status == 'INTERRUPTED' %}
         <span class="badge bg-dark" data-status="{{ tache.status }}"><i class="fas fa-stop-circle"></i> Interrompu</span>
         <a class="tache start" data-tacheid="{{ tache.id }}" href="{{ path('apidaebundle_taches_start',{'id':tache.id,'force':1}) }}"><i class="fas fa-play"></i></a>
     {% elseif tache.status == 'COMPLETED' %}
