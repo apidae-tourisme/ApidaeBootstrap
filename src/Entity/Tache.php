@@ -84,6 +84,11 @@ class Tache
      */
     private $signature;
 
+    /**
+     * @ORM\Column(nullable=true)
+     */
+    private Tache $tacheSuivante = null;
+
     private LoggerInterface $logger ;
 
 
@@ -244,6 +249,18 @@ class Tache
     public function setSignature(?string $signature): self
     {
         $this->signature = $signature;
+        return $this;
+    }
+
+    public function getTacheSuivante(): ?Tache
+    {
+        return $this->tacheSuivante;
+    }
+
+    public function setTacheSuivante(?Tache $tacheSuivante): self
+    {
+        $this->tacheSuivante = $tacheSuivante;
+
         return $this;
     }
 

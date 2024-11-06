@@ -82,6 +82,8 @@ class TacheCommand extends Command
              */
             $this->tachesLogger->error('Sortie de tâche sur une exception... '.$e->getMessage()) ;
             $tache->log('error', 'Sortie de tâche sur une exception... '.$e->getMessage()) ;
+            $this->tachesLogger->debug($e->getTraceAsString()) ;
+            $tache->log('debug', $e->getTraceAsString()) ;
             $tache->setStatus(TachesStatus::INTERRUPTED) ;
         }
 
@@ -100,6 +102,13 @@ class TacheCommand extends Command
         // Une fois la tâche terminée, on change son status
         if ($commandState === Command::SUCCESS) {
             $tache->setStatus(TachesStatus::COMPLETED);
+
+            // S'il y a une tâche à enchaîner (cas type : extract>insert sur outil d'import), on passe la tâche suivante à TO_RUN
+            $next = $tache->getTacheSuivante() ;
+            if ( $next != null && $next->getStatus() == TachesStatus::WAITING ) {
+                $next->setStatus(TachesStatus::TO_RUN) ;
+                $this->tachesServices->save($next) ;
+            }
         } else {
             $tache->setStatus(TachesStatus::FAILED);
         }

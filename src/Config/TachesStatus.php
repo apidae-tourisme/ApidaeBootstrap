@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 
 enum TachesStatus: string
 {
+    case WAITING = 'WAITING' ;
     case TO_RUN = 'TO_RUN' ;
     case RUNNING = 'RUNNING' ;
     case COMPLETED = 'COMPLETED' ;
