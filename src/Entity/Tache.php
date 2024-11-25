@@ -87,7 +87,7 @@ class Tache
     /**
      * @ORM\Column(nullable=true)
      */
-    private Tache $tacheSuivante = null;
+    private ?Tache $tacheSuivante = null;
 
     private LoggerInterface $logger ;
 
